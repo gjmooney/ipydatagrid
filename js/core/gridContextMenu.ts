@@ -121,6 +121,10 @@ export class FeatherGridContextMenu extends GridContextMenu {
           command: FeatherGridContextMenu.CommandID.ClearFiltersInAllColumns,
           args: args,
         });
+        this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.CopyToClipboard,
+          args: args,
+        });
         break;
       case 'corner-header':
         this._menu.addItem({
@@ -193,6 +197,7 @@ export namespace FeatherGridContextMenu {
     RevertGrid = 'grid:reset',
     ClearThisFilter = 'filter:clearCurrentColumn',
     ClearFiltersInAllColumns = 'filter:clearAllColumns',
+    CopyToClipboard = 'copyToClipboard',
   }
 
   /**
