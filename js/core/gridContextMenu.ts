@@ -114,6 +114,9 @@ export class FeatherGridContextMenu extends GridContextMenu {
           args: args,
         });
         this._menu.addItem({
+          type: 'separator',
+        });
+        this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.ClearThisFilter,
           args: args,
         });
@@ -144,15 +147,21 @@ export class FeatherGridContextMenu extends GridContextMenu {
           args: args,
         });
         this._menu.addItem({
+          type: 'separator',
+        });
+        this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.CopySelectionToClipboard,
+          args: args,
+        });
+        this._menu.addItem({
+          type: 'separator',
+        });
+        this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.ClearThisFilter,
           args: args,
         });
         this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.ClearFiltersInAllColumns,
-          args: args,
-        });
-        this._menu.addItem({
-          command: FeatherGridContextMenu.CommandID.CopySelectionToClipboard,
           args: args,
         });
         break;
