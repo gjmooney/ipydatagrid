@@ -1,4 +1,4 @@
-import { TextRenderer, CellRenderer, GraphicsContext } from '@lumino/datagrid';
+import { CellRenderer, GraphicsContext, TextRenderer } from '@lumino/datagrid';
 
 import { ViewBasedJSONModel } from './viewbasedjsonmodel';
 
@@ -279,7 +279,7 @@ export class HeaderRenderer extends TextRenderer {
     // Draw filter icon
     this.drawFilterIcon(gc, config);
     // Sets filter icon to gray fill
-    gc.fillStyle = Theme.getBorderColor(1);
+    gc.fillStyle = Theme.getBrandColor(this._isLightTheme ? 2 : 3);
     gc.fill();
 
     // Check for transform metadata
@@ -437,9 +437,12 @@ export class HeaderRenderer extends TextRenderer {
    * of hit testing.
    */
   static buttonSize = 11;
-  static iconHeight = 12;
-  static iconWidth = 7;
-  static buttonPadding = 3;
+  static iconHeight = 16;
+  static iconWidth = 10.5;
+  static buttonPadding = 5;
+  // static iconHeight = 12;
+  // static iconWidth = 7;
+  // static buttonPadding = 3;
   static iconSpacing = 1.5;
 
   private _isLightTheme: boolean;

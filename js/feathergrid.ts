@@ -1052,22 +1052,6 @@ export class FeatherGrid extends Widget {
         },
       },
     );
-    commands.addCommand(FeatherGridContextMenu.CommandID.AlignRight, {
-      label: 'Align Right',
-      mnemonic: 6,
-      execute: (args) => {
-        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
-        this._filterDialog.open({
-          x: commandArgs.clientX,
-          y: commandArgs.clientY,
-          region: commandArgs.region,
-          columnIndex: commandArgs.columnIndex,
-          forceX: false,
-          forceY: false,
-          mode: 'value',
-        });
-      },
-    });
     commands.addCommand(FeatherGridContextMenu.CommandID.CopyToClipboard, {
       label: 'Copy to Clipboard',
       mnemonic: -1,
@@ -1084,9 +1068,9 @@ export class FeatherGrid extends Widget {
   contextMenu: FeatherGridContextMenu;
   private _filterDialog: InteractiveFilterDialog;
   private _baseRowSize = 20;
-  private _baseColumnSize = 64;
+  private _baseColumnSize = 80;
   private _baseRowHeaderSize = 64;
-  private _baseColumnHeaderSize = 20;
+  private _baseColumnHeaderSize = 25;
   private _columnWidths: Dict<number> = {};
   private _headerVisibility: DataGrid.HeaderVisibility = 'all';
   private _dataModel: ViewBasedJSONModel;

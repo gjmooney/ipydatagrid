@@ -91,8 +91,7 @@ class SelectionHelper:
 
     def __iter__(self):
         selections = [
-            self._transform_rect_for_selection_mode(rect)
-            for rect in self._selections
+            self._transform_rect_for_selection_mode(rect) for rect in self._selections
         ]
         return SelectionIterator(selections)
 
@@ -143,9 +142,7 @@ class SelectionHelper:
 
         data = self._data
         primary_keys = (
-            []
-            if "primaryKey" not in data["schema"]
-            else data["schema"]["primaryKey"]
+            [] if "primaryKey" not in data["schema"] else data["schema"]["primaryKey"]
         )
         col_headers = [
             field["name"]
@@ -200,9 +197,7 @@ _data_serialization = {
 
 
 def _widgets_dict_to_json(x, obj):
-    return {
-        str(k): widget_serialization["to_json"](v, obj) for k, v in x.items()
-    }
+    return {str(k): widget_serialization["to_json"](v, obj) for k, v in x.items()}
 
 
 _widgets_dict_serialization = {
@@ -219,11 +214,11 @@ class DataGrid(DOMWidget):
     ----------
     base_row_size : int (default: 20)
         Default row height
-    base_column_size : int (default: 64)
+    base_column_size : int (default: 80)
         Default column width
     base_row_header_size : int (default: 64)
         Default row header width
-    base_column_header_size : int (default: 20)
+    base_column_header_size : int (default: 25)
         Default column header height
     header_visibility : {'all', 'row', 'column', 'none'} (default: 'all')
         Header visibility mode
@@ -331,9 +326,9 @@ class DataGrid(DOMWidget):
     _view_module_version = Unicode(module_version).tag(sync=True)
 
     base_row_size = Int(20).tag(sync=True)
-    base_column_size = Int(64).tag(sync=True)
+    base_column_size = Int(80).tag(sync=True)
     base_row_header_size = Int(64).tag(sync=True)
-    base_column_header_size = Int(20).tag(sync=True)
+    base_column_header_size = Int(25).tag(sync=True)
 
     header_visibility = Enum(
         default_value="all", values=["all", "row", "column", "none"]
@@ -346,9 +341,7 @@ class DataGrid(DOMWidget):
     renderers = Dict(Instance(CellRenderer)).tag(
         sync=True, **_widgets_dict_serialization
     )
-    default_renderer = Instance(CellRenderer).tag(
-        sync=True, **widget_serialization
-    )
+    default_renderer = Instance(CellRenderer).tag(sync=True, **widget_serialization)
     header_renderer = Instance(CellRenderer, allow_none=True).tag(
         sync=True, **widget_serialization
     )
@@ -361,9 +354,7 @@ class DataGrid(DOMWidget):
     selections = List(Dict()).tag(sync=True)
     editable = Bool(False).tag(sync=True)
     column_widths = Dict({}).tag(sync=True, **_data_serialization)
-    grid_style = Dict(allow_none=True).tag(
-        sync=True, **_widgets_dict_serialization
-    )
+    grid_style = Dict(allow_none=True).tag(sync=True, **_widgets_dict_serialization)
     auto_fit_columns = Bool(False).tag(sync=True)
     auto_fit_params = Dict(
         {"area": "all", "padding": 30, "numCols": None}, allow_none=False
@@ -382,9 +373,7 @@ class DataGrid(DOMWidget):
     def __handle_custom_msg(self, _, content, buffers):  # noqa: U101,U100
         if content["event_type"] == "cell-changed":
             row = content["row"]
-            column = self._column_index_to_name(
-                self._data, content["column_index"]
-            )
+            column = self._column_index_to_name(self._data, content["column_index"])
             value = content["value"]
             # update data on kernel
             self._data["data"][row][column] = value
@@ -434,9 +423,7 @@ class DataGrid(DOMWidget):
         # Primary key used
         index_key = self.get_dataframe_index(dataframe)
 
-        self._data = self.generate_data_object(
-            dataframe, "ipydguuid", index_key
-        )
+        self._data = self.generate_data_object(dataframe, "ipydguuid", index_key)
 
     @staticmethod
     def generate_data_object(dataframe, guid_key="ipydguuid", index_name="key"):
@@ -567,9 +554,7 @@ class DataGrid(DOMWidget):
                 self._data["data"][row_index][column] = new_value[column_index]
 
                 column_index = column_index + 1
-                column = DataGrid._column_index_to_name(
-                    self._data, column_index
-                )
+                column = DataGrid._column_index_to_name(self._data, column_index)
 
             self._notify_row_change(row_index, new_value)
         return True
@@ -706,9 +691,7 @@ class DataGrid(DOMWidget):
         List of selected cells. Each cell is represented as a dictionary
         with keys 'r': row and 'c': column
         """
-        return SelectionHelper(
-            self._data, self.selections, self.selection_mode
-        ).all()
+        return SelectionHelper(self._data, self.selections, self.selection_mode).all()
 
     @property
     def selected_cell_values(self):
@@ -722,9 +705,7 @@ class DataGrid(DOMWidget):
         index_key = self.get_dataframe_index(view_data)
 
         # Serielize to JSON table schema
-        view_data_object = self.generate_data_object(
-            view_data, "ipydguuid", index_key
-        )
+        view_data_object = self.generate_data_object(view_data, "ipydguuid", index_key)
 
         return SelectionHelper(
             view_data_object, self.selections, self.selection_mode
@@ -812,18 +793,12 @@ class DataGrid(DOMWidget):
         if "schema" not in data or "fields" not in data["schema"]:
             return None
         col_headers = DataGrid._get_col_headers(data)
-        return (
-            None
-            if len(col_headers) <= column_index
-            else col_headers[column_index]
-        )
+        return None if len(col_headers) <= column_index else col_headers[column_index]
 
     @staticmethod
     def _get_col_headers(data):
         primary_keys = (
-            []
-            if "primaryKey" not in data["schema"]
-            else data["schema"]["primaryKey"]
+            [] if "primaryKey" not in data["schema"] else data["schema"]["primaryKey"]
         )
         col_headers = [
             field["name"]
