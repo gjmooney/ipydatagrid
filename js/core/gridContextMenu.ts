@@ -151,6 +151,10 @@ export class FeatherGridContextMenu extends GridContextMenu {
           command: FeatherGridContextMenu.CommandID.ClearFiltersInAllColumns,
           args: args,
         });
+        this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.CopySelectionToClipboard,
+          args: args,
+        });
         break;
       case 'body':
         this._menu.addItem({
@@ -198,6 +202,7 @@ export namespace FeatherGridContextMenu {
     ClearThisFilter = 'filter:clearCurrentColumn',
     ClearFiltersInAllColumns = 'filter:clearAllColumns',
     CopyToClipboard = 'copyToClipboard',
+    CopySelectionToClipboard = 'copySelectionToClipboard',
   }
 
   /**

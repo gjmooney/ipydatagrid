@@ -1,4 +1,3 @@
-import { toArray } from '@lumino/algorithm';
 import { CommandRegistry } from '@lumino/commands';
 import {
   BasicSelectionModel,
@@ -436,7 +435,7 @@ export class FeatherGrid extends Widget {
 
     // Replace method of copying to clipboard with one that allows
     // a ClipboardEvent to reach document.body
-    this.grid.copyToClipboard = this.copyToClipboard.bind(this.grid);
+    // this.grid.copyToClipboard = this.copySelectionToClipboard.bind(this.grid);
 
     this.grid.dataModel = this._dataModel;
     this.grid.keyHandler = new KeyHandler();
@@ -586,245 +585,249 @@ export class FeatherGrid extends Widget {
     this._updateHeaderRenderer();
   }
 
-  copyToClipboard(): void {
-    console.log('copya');
-    // const grid = <DataGrid>(<unknown>this);
-    const grid = this.grid;
-    console.log('copyb', grid);
-    // Fetch the data model.
-    const dataModel = grid.dataModel;
-    console.log('copyc');
+  // copySelectionToClipboard(): void {
+  //   console.log('copya');
+  //   const grid = <DataGrid>(<unknown>this);
+  //   // const grid = this.grid;
+  //   console.log('copyb', grid);
+  //   // Fetch the data model.
+  //   const dataModel = grid.dataModel;
+  //   console.log('copyc');
 
-    // Bail early if there is no data model.
-    if (!dataModel) {
-      console.log('copyd');
-      return;
-    }
+  //   // Bail early if there is no data model.
+  //   if (!dataModel) {
+  //     console.log('copyd');
+  //     return;
+  //   }
 
-    console.log('dataModel', dataModel);
+  //   console.log('dataModel', dataModel);
 
-    // Fetch the selection model.
-    console.log('copye');
-    const selectionModel = grid.selectionModel;
+  //   // Fetch the selection model.
+  //   console.log('copye');
+  //   const selectionModel = grid.selectionModel;
 
-    // Bail early if there is no selection model.
-    if (!selectionModel) {
-      console.log('copyf');
-      return;
-    }
+  //   console.log('selectionModel', selectionModel);
 
-    // Coerce the selections to an array.
-    console.log('copy1');
-    const selections = toArray(selectionModel.selections());
+  //   // Bail early if there is no selection model.
+  //   if (!selectionModel) {
+  //     console.log('copyf');
+  //     return;
+  //   }
 
-    // Bail early if there are no selections.
-    if (selections.length === 0) {
-      console.log('copy2');
-      return;
-    }
+  //   // Coerce the selections to an array.
+  //   console.log('copy1');
+  //   const selections = Array.from(selectionModel.selections());
+  //   // const selections = toArray(selectionModel.selections());
 
-    // Alert that multiple selections cannot be copied.
-    if (selections.length > 1) {
-      console.log('copy');
-      alert('Cannot copy multiple grid selections.');
-      return;
-    }
+  //   // Bail early if there are no selections.
+  //   if (selections.length === 0) {
+  //     console.log('copy2');
+  //     return;
+  //   }
 
-    // Fetch the model counts.
-    console.log('copy3');
-    const br = dataModel.rowCount('body');
-    console.log('copy4');
-    const bc = dataModel.columnCount('body');
+  //   // Alert that multiple selections cannot be copied.
+  //   if (selections.length > 1) {
+  //     console.log('copy');
+  //     alert('Cannot copy multiple grid selections.');
+  //     return;
+  //   }
 
-    // Bail early if there is nothing to copy.
-    if (br === 0 || bc === 0) {
-      console.log('copy5');
-      return;
-    }
+  //   // Fetch the model counts.
+  //   console.log('copy3');
+  //   const br = dataModel.rowCount('body');
+  //   console.log('copy4');
+  //   const bc = dataModel.columnCount('body');
 
-    // Unpack the selection.
-    console.log('copy6');
-    let { r1, c1, r2, c2 } = selections[0];
+  //   // Bail early if there is nothing to copy.
+  //   if (br === 0 || bc === 0) {
+  //     console.log('copy5');
+  //     return;
+  //   }
 
-    // Clamp the selection to the model bounds.
-    console.log('copy7');
-    r1 = Math.max(0, Math.min(r1, br - 1));
-    console.log('copy8');
-    c1 = Math.max(0, Math.min(c1, bc - 1));
-    console.log('copy9');
-    r2 = Math.max(0, Math.min(r2, br - 1));
-    console.log('copy10');
-    c2 = Math.max(0, Math.min(c2, bc - 1));
+  //   // Unpack the selection.
+  //   console.log('copy6');
+  //   let { r1, c1, r2, c2 } = selections[0];
 
-    // Ensure the limits are well-orderd.
-    console.log('copy11');
-    if (r2 < r1) [r1, r2] = [r2, r1];
-    console.log('copy12');
-    if (c2 < c1) [c1, c2] = [c2, c1];
+  //   // Clamp the selection to the model bounds.
+  //   console.log('copy7');
+  //   r1 = Math.max(0, Math.min(r1, br - 1));
+  //   console.log('copy8');
+  //   c1 = Math.max(0, Math.min(c1, bc - 1));
+  //   console.log('copy9');
+  //   r2 = Math.max(0, Math.min(r2, br - 1));
+  //   console.log('copy10');
+  //   c2 = Math.max(0, Math.min(c2, bc - 1));
 
-    // Fetch the header counts.
-    console.log('copy13');
-    let rhc = dataModel.columnCount('row-header');
-    console.log('copy14');
-    let chr = dataModel.rowCount('column-header');
+  //   // Ensure the limits are well-orderd.
+  //   console.log('copy11');
+  //   if (r2 < r1) [r1, r2] = [r2, r1];
+  //   console.log('copy12');
+  //   if (c2 < c1) [c1, c2] = [c2, c1];
 
-    // Unpack the copy config.
-    console.log('copy15');
-    const separator = grid.copyConfig.separator;
-    console.log('copy16');
-    const format = grid.copyConfig.format;
-    console.log('copy17');
-    const headers = grid.copyConfig.headers;
-    console.log('copy18');
-    const warningThreshold = grid.copyConfig.warningThreshold;
+  //   // Fetch the header counts.
+  //   console.log('copy13');
+  //   let rhc = dataModel.columnCount('row-header');
+  //   console.log('copy14');
+  //   let chr = dataModel.rowCount('column-header');
 
-    // Compute the number of cells to be copied.
-    console.log('copy19');
-    let rowCount = r2 - r1 + 1;
-    console.log('copy20');
-    let colCount = c2 - c1 + 1;
-    console.log('copy21');
-    switch (headers) {
-      case 'none':
-        console.log('copy22');
-        rhc = 0;
-        chr = 0;
-        break;
-      case 'row':
-        console.log('copy23');
-        chr = 0;
-        colCount += rhc;
-        break;
-      case 'column':
-        console.log('copy24');
-        rhc = 0;
-        rowCount += chr;
-        break;
-      case 'all':
-        console.log('copy26');
-        rowCount += chr;
-        colCount += rhc;
-        break;
-      default:
-        throw 'unreachable';
-    }
+  //   // Unpack the copy config.
+  //   console.log('copy15');
+  //   const separator = grid.copyConfig.separator;
+  //   console.log('copy16');
+  //   const format = grid.copyConfig.format;
+  //   console.log('copy17');
+  //   const headers = grid.copyConfig.headers;
+  //   console.log('copy18');
+  //   const warningThreshold = grid.copyConfig.warningThreshold;
 
-    // Compute the total cell count.
-    console.log('copy27');
-    const cellCount = rowCount * colCount;
+  //   // Compute the number of cells to be copied.
+  //   console.log('copy19');
+  //   let rowCount = r2 - r1 + 1;
+  //   console.log('copy20');
+  //   let colCount = c2 - c1 + 1;
+  //   console.log('copy21');
+  //   switch (headers) {
+  //     case 'none':
+  //       console.log('copy22');
+  //       rhc = 0;
+  //       chr = 0;
+  //       break;
+  //     case 'row':
+  //       console.log('copy23');
+  //       chr = 0;
+  //       colCount += rhc;
+  //       break;
+  //     case 'column':
+  //       console.log('copy24');
+  //       rhc = 0;
+  //       rowCount += chr;
+  //       break;
+  //     case 'all':
+  //       console.log('copy26');
+  //       rowCount += chr;
+  //       colCount += rhc;
+  //       break;
+  //     default:
+  //       throw 'unreachable';
+  //   }
 
-    // Allow the user to cancel a large copy request.
-    if (cellCount > warningThreshold) {
-      console.log('copy');
-      const msg = `Copying ${cellCount} cells may take a while. Continue?`;
-      if (!window.confirm(msg)) {
-        return;
-      }
-    }
+  //   // Compute the total cell count.
+  //   console.log('copy27');
+  //   const cellCount = rowCount * colCount;
 
-    // Set up the format args.
-    console.log('copy28');
-    const args = {
-      region: 'body' as DataModel.CellRegion,
-      row: 0,
-      column: 0,
-      value: null as any,
-      metadata: {} as DataModel.Metadata,
-    };
+  //   // Allow the user to cancel a large copy request.
+  //   if (cellCount > warningThreshold) {
+  //     console.log('copy');
+  //     const msg = `Copying ${cellCount} cells may take a while. Continue?`;
+  //     if (!window.confirm(msg)) {
+  //       return;
+  //     }
+  //   }
 
-    // Allocate the array of rows.
-    console.log('copy29');
-    const rows = new Array<string[]>(rowCount);
+  //   // Set up the format args.
+  //   console.log('copy28');
+  //   const args = {
+  //     region: 'body' as DataModel.CellRegion,
+  //     row: 0,
+  //     column: 0,
+  //     value: null as any,
+  //     metadata: {} as DataModel.Metadata,
+  //   };
 
-    // Iterate over the rows.
-    console.log('copy30');
-    for (let j = 0; j < rowCount; ++j) {
-      // Allocate the array of cells.
-      const cells = new Array<string>(colCount);
+  //   // Allocate the array of rows.
+  //   console.log('copy29');
+  //   const rows = new Array<string[]>(rowCount);
 
-      // Iterate over the columns.
-      console.log('copy31');
-      for (let i = 0; i < colCount; ++i) {
-        // Set up the format variables.
-        let region: DataModel.CellRegion;
-        let row: number;
-        let column: number;
+  //   // Iterate over the rows.
+  //   console.log('copy30');
+  //   for (let j = 0; j < rowCount; ++j) {
+  //     // Allocate the array of cells.
+  //     const cells = new Array<string>(colCount);
 
-        // Populate the format variables.
-        if (j < chr && i < rhc) {
-          console.log('copy32');
-          region = 'corner-header';
-          row = j;
-          column = i;
-        } else if (j < chr) {
-          console.log('copy33');
-          region = 'column-header';
-          row = j;
-          column = i - rhc + c1;
-        } else if (i < rhc) {
-          console.log('copy34');
-          region = 'row-header';
-          row = j - chr + r1;
-          column = i;
-        } else {
-          console.log('copy35');
-          region = 'body';
-          row = j - chr + r1;
-          column = i - rhc + c1;
-        }
+  //     // Iterate over the columns.
+  //     console.log('copy31');
+  //     for (let i = 0; i < colCount; ++i) {
+  //       // Set up the format variables.
+  //       let region: DataModel.CellRegion;
+  //       let row: number;
+  //       let column: number;
 
-        // Populate the format args.
-        console.log('copy36');
-        args.region = region;
-        console.log('copy37');
-        args.row = row;
-        console.log('copy38');
-        args.column = column;
-        console.log('copy39');
-        args.value = dataModel.data(region, row, column);
-        console.log('copy40');
-        args.metadata = dataModel.metadata(region, row, column);
+  //       // Populate the format variables.
+  //       if (j < chr && i < rhc) {
+  //         console.log('copy32');
+  //         region = 'corner-header';
+  //         row = j;
+  //         column = i;
+  //       } else if (j < chr) {
+  //         console.log('copy33');
+  //         region = 'column-header';
+  //         row = j;
+  //         column = i - rhc + c1;
+  //       } else if (i < rhc) {
+  //         console.log('copy34');
+  //         region = 'row-header';
+  //         row = j - chr + r1;
+  //         column = i;
+  //       } else {
+  //         console.log('copy35');
+  //         region = 'body';
+  //         row = j - chr + r1;
+  //         column = i - rhc + c1;
+  //       }
 
-        // Format the cell.
-        console.log('copy41');
-        cells[i] = format(args);
-      }
+  //       // Populate the format args.
+  //       console.log('copy36');
+  //       args.region = region;
+  //       console.log('copy37');
+  //       args.row = row;
+  //       console.log('copy38');
+  //       args.column = column;
+  //       console.log('copy39');
+  //       args.value = dataModel.data(region, row, column);
+  //       console.log('copy40');
+  //       args.metadata = dataModel.metadata(region, row, column);
 
-      // Save the row of cells.
-      console.log('copy42');
-      rows[j] = cells;
-    }
+  //       // Format the cell.
+  //       console.log('copy41');
+  //       cells[i] = format(args);
+  //     }
 
-    // Convert the cells into lines.
-    console.log('copy43');
-    const lines = rows.map((cells) => cells.join(separator));
+  //     // Save the row of cells.
+  //     console.log('copy42');
+  //     rows[j] = cells;
+  //   }
 
-    // Convert the lines into text.
-    console.log('copy44');
-    const text = lines.join('\n');
+  //   // Convert the cells into lines.
+  //   console.log('copy43');
+  //   const lines = rows.map((cells) => cells.join(separator));
 
-    // Copy the text to the clipboard.
-    console.log('copy45');
-    const textArea = document.createElement('textarea');
-    textArea.innerHTML = text;
+  //   // Convert the lines into text.
+  //   console.log('copy44');
+  //   const text = lines.join('\n');
 
-    // Text area has to be visible on page for copy without Clipboard API,
-    // So we create an "invisible" element, add it to the body, then remove
-    // when no longer needed.
+  //   // Copy the text to the clipboard.
+  //   console.log('copy45');
+  //   navigator.clipboard.writeText(text);
+  //   // const textArea = document.createElement('textarea');
+  //   // textArea.innerHTML = text;
 
-    console.log('copy46');
-    textArea.style.height = '0px';
-    textArea.style.width = '0px';
-    textArea.style.overflow = 'hidden';
-    textArea.id = 'ipydatagrid-textarea';
-    textArea.style.position = 'absolute';
-    document.body.appendChild(textArea);
-    textArea.select();
-    console.log('copy47');
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    console.log('copy48');
-  }
+  //   // // Text area has to be visible on page for copy without Clipboard API,
+  //   // // So we create an "invisible" element, add it to the body, then remove
+  //   // // when no longer needed.
+
+  //   // console.log('copy46');
+  //   // textArea.style.height = '0px';
+  //   // textArea.style.width = '0px';
+  //   // textArea.style.overflow = 'hidden';
+  //   // textArea.id = 'ipydatagrid-textarea';
+  //   // textArea.style.position = 'absolute';
+  //   // document.body.appendChild(textArea);
+  //   // textArea.select();
+  //   // console.log('copy47');
+  //   // document.execCommand('copy');
+  //   // document.body.removeChild(textArea);
+  //   console.log('copy48');
+  // }
 
   /**
    * A signal emitted when a grid cell is clicked.
@@ -1052,14 +1055,17 @@ export class FeatherGrid extends Widget {
         },
       },
     );
-    commands.addCommand(FeatherGridContextMenu.CommandID.CopyToClipboard, {
-      label: 'Copy to Clipboard',
-      mnemonic: -1,
-      execute: () => {
-        // const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
-        this.copyToClipboard();
+    commands.addCommand(
+      FeatherGridContextMenu.CommandID.CopySelectionToClipboard,
+      {
+        label: 'Copy Selection to Clipboard',
+        mnemonic: -1,
+        execute: () => {
+          // const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+          this.grid.copyToClipboard();
+        },
       },
-    });
+    );
     return commands;
   }
 
