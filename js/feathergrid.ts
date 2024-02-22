@@ -122,6 +122,12 @@ export class FeatherGrid extends Widget {
     }
     this._headerVisibility = options.headerVisibility || this._headerVisibility;
 
+    // Combine defaults with user settings
+    options.copyConfig = {
+      ...DataGrid.defaultCopyConfig,
+      ...options.copyConfig,
+    };
+
     this._createGrid(options);
 
     this._defaultRenderer = new TextRenderer({
@@ -534,6 +540,15 @@ export class FeatherGrid extends Widget {
     };
   }
 
+  public setCopyConfig(): void {
+    this.grid.copyConfig = {
+      format: this.grid.copyConfig.format,
+      headers: this.grid.copyConfig.headers,
+      separator: this.grid.copyConfig.separator,
+      warningThreshold: this.grid.copyConfig.warningThreshold,
+    };
+  }
+
   public updateGridStyle(): void {
     this.setGridStyle();
 
@@ -586,124 +601,88 @@ export class FeatherGrid extends Widget {
   }
 
   // copySelectionToClipboard(): void {
-  //   console.log('copya');
   //   const grid = <DataGrid>(<unknown>this);
   //   // const grid = this.grid;
-  //   console.log('copyb', grid);
   //   // Fetch the data model.
   //   const dataModel = grid.dataModel;
-  //   console.log('copyc');
 
   //   // Bail early if there is no data model.
   //   if (!dataModel) {
-  //     console.log('copyd');
   //     return;
   //   }
 
-  //   console.log('dataModel', dataModel);
-
   //   // Fetch the selection model.
-  //   console.log('copye');
   //   const selectionModel = grid.selectionModel;
-
-  //   console.log('selectionModel', selectionModel);
 
   //   // Bail early if there is no selection model.
   //   if (!selectionModel) {
-  //     console.log('copyf');
   //     return;
   //   }
 
   //   // Coerce the selections to an array.
-  //   console.log('copy1');
   //   const selections = Array.from(selectionModel.selections());
   //   // const selections = toArray(selectionModel.selections());
 
   //   // Bail early if there are no selections.
   //   if (selections.length === 0) {
-  //     console.log('copy2');
   //     return;
   //   }
 
   //   // Alert that multiple selections cannot be copied.
   //   if (selections.length > 1) {
-  //     console.log('copy');
   //     alert('Cannot copy multiple grid selections.');
   //     return;
   //   }
 
   //   // Fetch the model counts.
-  //   console.log('copy3');
   //   const br = dataModel.rowCount('body');
-  //   console.log('copy4');
   //   const bc = dataModel.columnCount('body');
 
   //   // Bail early if there is nothing to copy.
   //   if (br === 0 || bc === 0) {
-  //     console.log('copy5');
   //     return;
   //   }
 
   //   // Unpack the selection.
-  //   console.log('copy6');
   //   let { r1, c1, r2, c2 } = selections[0];
 
   //   // Clamp the selection to the model bounds.
-  //   console.log('copy7');
   //   r1 = Math.max(0, Math.min(r1, br - 1));
-  //   console.log('copy8');
   //   c1 = Math.max(0, Math.min(c1, bc - 1));
-  //   console.log('copy9');
   //   r2 = Math.max(0, Math.min(r2, br - 1));
-  //   console.log('copy10');
   //   c2 = Math.max(0, Math.min(c2, bc - 1));
 
   //   // Ensure the limits are well-orderd.
-  //   console.log('copy11');
   //   if (r2 < r1) [r1, r2] = [r2, r1];
-  //   console.log('copy12');
   //   if (c2 < c1) [c1, c2] = [c2, c1];
 
   //   // Fetch the header counts.
-  //   console.log('copy13');
   //   let rhc = dataModel.columnCount('row-header');
-  //   console.log('copy14');
   //   let chr = dataModel.rowCount('column-header');
 
   //   // Unpack the copy config.
-  //   console.log('copy15');
   //   const separator = grid.copyConfig.separator;
-  //   console.log('copy16');
   //   const format = grid.copyConfig.format;
-  //   console.log('copy17');
   //   const headers = grid.copyConfig.headers;
-  //   console.log('copy18');
   //   const warningThreshold = grid.copyConfig.warningThreshold;
 
   //   // Compute the number of cells to be copied.
-  //   console.log('copy19');
   //   let rowCount = r2 - r1 + 1;
-  //   console.log('copy20');
   //   let colCount = c2 - c1 + 1;
-  //   console.log('copy21');
   //   switch (headers) {
   //     case 'none':
-  //       console.log('copy22');
   //       rhc = 0;
   //       chr = 0;
   //       break;
   //     case 'row':
-  //       console.log('copy23');
   //       chr = 0;
   //       colCount += rhc;
   //       break;
   //     case 'column':
-  //       console.log('copy24');
   //       rhc = 0;
   //       rowCount += chr;
   //       break;
   //     case 'all':
-  //       console.log('copy26');
   //       rowCount += chr;
   //       colCount += rhc;
   //       break;
@@ -712,7 +691,6 @@ export class FeatherGrid extends Widget {
   //   }
 
   //   // Compute the total cell count.
-  //   console.log('copy27');
   //   const cellCount = rowCount * colCount;
 
   //   // Allow the user to cancel a large copy request.
@@ -725,7 +703,6 @@ export class FeatherGrid extends Widget {
   //   }
 
   //   // Set up the format args.
-  //   console.log('copy28');
   //   const args = {
   //     region: 'body' as DataModel.CellRegion,
   //     row: 0,
@@ -735,17 +712,14 @@ export class FeatherGrid extends Widget {
   //   };
 
   //   // Allocate the array of rows.
-  //   console.log('copy29');
   //   const rows = new Array<string[]>(rowCount);
 
   //   // Iterate over the rows.
-  //   console.log('copy30');
   //   for (let j = 0; j < rowCount; ++j) {
   //     // Allocate the array of cells.
   //     const cells = new Array<string>(colCount);
 
   //     // Iterate over the columns.
-  //     console.log('copy31');
   //     for (let i = 0; i < colCount; ++i) {
   //       // Set up the format variables.
   //       let region: DataModel.CellRegion;
@@ -754,59 +728,45 @@ export class FeatherGrid extends Widget {
 
   //       // Populate the format variables.
   //       if (j < chr && i < rhc) {
-  //         console.log('copy32');
   //         region = 'corner-header';
   //         row = j;
   //         column = i;
   //       } else if (j < chr) {
-  //         console.log('copy33');
   //         region = 'column-header';
   //         row = j;
   //         column = i - rhc + c1;
   //       } else if (i < rhc) {
-  //         console.log('copy34');
   //         region = 'row-header';
   //         row = j - chr + r1;
   //         column = i;
   //       } else {
-  //         console.log('copy35');
   //         region = 'body';
   //         row = j - chr + r1;
   //         column = i - rhc + c1;
   //       }
 
   //       // Populate the format args.
-  //       console.log('copy36');
   //       args.region = region;
-  //       console.log('copy37');
   //       args.row = row;
-  //       console.log('copy38');
   //       args.column = column;
-  //       console.log('copy39');
   //       args.value = dataModel.data(region, row, column);
-  //       console.log('copy40');
   //       args.metadata = dataModel.metadata(region, row, column);
 
   //       // Format the cell.
-  //       console.log('copy41');
   //       cells[i] = format(args);
   //     }
 
   //     // Save the row of cells.
-  //     console.log('copy42');
   //     rows[j] = cells;
   //   }
 
   //   // Convert the cells into lines.
-  //   console.log('copy43');
   //   const lines = rows.map((cells) => cells.join(separator));
 
   //   // Convert the lines into text.
-  //   console.log('copy44');
   //   const text = lines.join('\n');
 
   //   // Copy the text to the clipboard.
-  //   console.log('copy45');
   //   navigator.clipboard.writeText(text);
   //   // const textArea = document.createElement('textarea');
   //   // textArea.innerHTML = text;
@@ -826,7 +786,6 @@ export class FeatherGrid extends Widget {
   //   // console.log('copy47');
   //   // document.execCommand('copy');
   //   // document.body.removeChild(textArea);
-  //   console.log('copy48');
   // }
 
   /**
@@ -1091,6 +1050,11 @@ export class FeatherGrid extends Widget {
   private _cellClicked = new Signal<this, FeatherGrid.ICellClickedEvent>(this);
   private _columnsResized = new Signal<this, void>(this);
   private _isLightTheme = true;
+  // private _copyConfig: DataGrid.CopyConfig = DataGrid.defaultCopyConfig;
+  // private _format: DataGrid.CopyFormatFunc = DataGrid.defaultCopyConfig.format;
+  // private _headers: 'none' | 'row' | 'column' | 'all' = 'all';
+  // private _separator = '\t';
+  // private _warningThreshold = 1e6;
 }
 
 /**

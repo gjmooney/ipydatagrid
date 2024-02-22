@@ -24,7 +24,7 @@ import {
   JupyterPhosphorPanelWidget,
   resolvePromisesDict,
   unpack_models,
-  WidgetModel
+  WidgetModel,
 } from '@jupyter-widgets/base';
 
 import { ViewBasedJSONModel } from './core/viewbasedjsonmodel';
@@ -95,10 +95,7 @@ export class DataGridModel extends DOMWidgetModel {
       }
 
       if (content.event_type === 'row-changed') {
-        this.data_model.setRowData(
-          content.row,
-          content.value,
-        );
+        this.data_model.setRowData(content.row, content.value);
       }
     });
   }
@@ -205,7 +202,7 @@ export class DataGridModel extends DOMWidgetModel {
           let selection = null;
 
           // @ts-ignore
-          selectionIter = selectionIter.iter()
+          selectionIter = selectionIter.iter();
 
           while ((selection = selectionIter.next())) {
             selections.push({
@@ -223,7 +220,7 @@ export class DataGridModel extends DOMWidgetModel {
           // Lumino 2 (JupyterLab 4)
           let selectionNode = null;
 
-          while (selectionNode = selectionIter.next()) {
+          while ((selectionNode = selectionIter.next())) {
             if (selectionNode.done) {
               break;
             }
@@ -408,10 +405,7 @@ export class DataGridView extends DOMWidgetView {
   };
 
   // ipywidgets 7 compatibility
-  _processLuminoMessage(
-    msg: Message,
-    _super: any,
-  ): void {
+  _processLuminoMessage(msg: Message, _super: any): void {
     _super.call(this, msg);
 
     switch (msg.type) {
@@ -449,6 +443,13 @@ export class DataGridView extends DOMWidgetView {
       },
       headerVisibility: this.model.get('header_visibility'),
       style: this.model.get('grid_style'),
+      // copyConfig: {
+      //   format: this.model.get('format'),
+      //   headers: this.model.get('headers'),
+      //   separator: this.model.get('separator'),
+      //   warningThreshold: this.model.get('warning_threshold'),
+      // },
+      copyConfig: this.model.get('copy_config'),
     });
 
     this.grid.columnWidths = this.model.get('column_widths');
@@ -775,11 +776,11 @@ export {
   BarRendererModel,
   BarRendererView,
   HyperlinkRendererModel,
-  HyperlinkRendererView, TextRendererModel,
-  TextRendererView
+  HyperlinkRendererView,
+  TextRendererModel,
+  TextRendererView,
 } from './cellrenderer';
 export { VegaExprModel, VegaExprView } from './vegaexpr';
-
 
 export namespace DataGridModel {
   /**
@@ -810,7 +811,6 @@ namespace Private {
     // @ts-ignore needed for ipywidget 7.x compatibility
     return JupyterLuminoPanelWidget ?? JupyterPhosphorPanelWidget;
   }
-
 
   /**
    * Creates a valid JSON Table Schema from the schema provided by pandas.

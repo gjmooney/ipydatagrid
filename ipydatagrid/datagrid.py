@@ -360,6 +360,8 @@ class DataGrid(DOMWidget):
         {"area": "all", "padding": 30, "numCols": None}, allow_none=False
     ).tag(sync=True)
 
+    copy_config = Dict(allow_none=True).tag(sync=True, **_widgets_dict_serialization)
+
     def __init__(self, dataframe, index_name=None, **kwargs):
         # Setting default index name if not explicitly
         # set by the user.
