@@ -1031,7 +1031,7 @@ export class FeatherGrid extends Widget {
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.SortClear, {
       label: 'No Sort',
-      mnemonic: -1,
+      mnemonic: 1,
       execute: (args) => {
         const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
         const schemaIndex: number = this._dataModel.getSchemaIndex(
@@ -1039,6 +1039,13 @@ export class FeatherGrid extends Widget {
           commandArgs.columnIndex,
         );
         this._dataModel.removeTransform(schemaIndex, 'sort');
+      },
+    });
+    commands.addCommand(FeatherGridContextMenu.CommandID.ClearSelection, {
+      label: 'Clear Selection',
+      mnemonic: -1,
+      execute: () => {
+        this.grid.selectionModel?.clear();
       },
     });
     return commands;
