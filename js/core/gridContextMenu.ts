@@ -106,6 +106,13 @@ export class FeatherGridContextMenu extends GridContextMenu {
           args: args,
         });
         this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.SortClear,
+          args: args,
+        });
+        this._menu.addItem({
+          type: 'separator',
+        });
+        this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.OpenFilterByConditionDialog,
           args: args,
         });
@@ -137,6 +144,13 @@ export class FeatherGridContextMenu extends GridContextMenu {
         this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.SortDescending,
           args: args,
+        });
+        this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.SortClear,
+          args: args,
+        });
+        this._menu.addItem({
+          type: 'separator',
         });
         this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.OpenFilterByConditionDialog,
@@ -209,6 +223,7 @@ export namespace FeatherGridContextMenu {
   export enum CommandID {
     SortAscending = 'sort:Asc',
     SortDescending = 'sort:Desc',
+    SortClear = 'sort:Clear',
     OpenFilterByConditionDialog = 'filterCondition:openDialog',
     OpenFilterByValueDialog = 'filterValue:openDialog',
     RevertGrid = 'grid:reset',

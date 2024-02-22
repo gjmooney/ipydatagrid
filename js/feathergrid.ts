@@ -1029,6 +1029,18 @@ export class FeatherGrid extends Widget {
         this.downloadSelectedAsCsv();
       },
     });
+    commands.addCommand(FeatherGridContextMenu.CommandID.SortClear, {
+      label: 'No Sort',
+      mnemonic: -1,
+      execute: (args) => {
+        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+        const schemaIndex: number = this._dataModel.getSchemaIndex(
+          commandArgs.region,
+          commandArgs.columnIndex,
+        );
+        this._dataModel.removeTransform(schemaIndex, 'sort');
+      },
+    });
     return commands;
   }
 
