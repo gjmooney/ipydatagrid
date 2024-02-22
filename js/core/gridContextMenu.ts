@@ -154,6 +154,10 @@ export class FeatherGridContextMenu extends GridContextMenu {
           args: args,
         });
         this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.SaveSelectionAsCsv,
+          args: args,
+        });
+        this._menu.addItem({
           type: 'separator',
         });
         this._menu.addItem({
@@ -212,6 +216,7 @@ export namespace FeatherGridContextMenu {
     ClearFiltersInAllColumns = 'filter:clearAllColumns',
     CopyToClipboard = 'copyToClipboard',
     CopySelectionToClipboard = 'copySelectionToClipboard',
+    SaveSelectionAsCsv = 'saveSelectionAsCsv',
   }
 
   /**

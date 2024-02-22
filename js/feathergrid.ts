@@ -540,15 +540,6 @@ export class FeatherGrid extends Widget {
     };
   }
 
-  public setCopyConfig(): void {
-    this.grid.copyConfig = {
-      format: this.grid.copyConfig.format,
-      headers: this.grid.copyConfig.headers,
-      separator: this.grid.copyConfig.separator,
-      warningThreshold: this.grid.copyConfig.warningThreshold,
-    };
-  }
-
   public updateGridStyle(): void {
     this.setGridStyle();
 
@@ -600,192 +591,199 @@ export class FeatherGrid extends Widget {
     this._updateHeaderRenderer();
   }
 
-  // copySelectionToClipboard(): void {
-  //   const grid = <DataGrid>(<unknown>this);
-  //   // const grid = this.grid;
-  //   // Fetch the data model.
-  //   const dataModel = grid.dataModel;
+  downloadSelectedAsCsv(): void {
+    const grid = this.grid;
+    // Fetch the data model.
+    const dataModel = grid.dataModel;
 
-  //   // Bail early if there is no data model.
-  //   if (!dataModel) {
-  //     return;
-  //   }
+    // Bail early if there is no data model.
+    if (!dataModel) {
+      return;
+    }
 
-  //   // Fetch the selection model.
-  //   const selectionModel = grid.selectionModel;
+    // Fetch the selection model.
+    const selectionModel = grid.selectionModel;
 
-  //   // Bail early if there is no selection model.
-  //   if (!selectionModel) {
-  //     return;
-  //   }
+    // Bail early if there is no selection model.
+    if (!selectionModel) {
+      return;
+    }
 
-  //   // Coerce the selections to an array.
-  //   const selections = Array.from(selectionModel.selections());
-  //   // const selections = toArray(selectionModel.selections());
+    // Coerce the selections to an array.
+    const selections = Array.from(selectionModel.selections());
 
-  //   // Bail early if there are no selections.
-  //   if (selections.length === 0) {
-  //     return;
-  //   }
+    // Bail early if there are no selections.
+    if (selections.length === 0) {
+      return;
+    }
 
-  //   // Alert that multiple selections cannot be copied.
-  //   if (selections.length > 1) {
-  //     alert('Cannot copy multiple grid selections.');
-  //     return;
-  //   }
+    // Alert that multiple selections cannot be saved.
+    if (selections.length > 1) {
+      alert('Cannot save multiple grid selections.');
+      return;
+    }
 
-  //   // Fetch the model counts.
-  //   const br = dataModel.rowCount('body');
-  //   const bc = dataModel.columnCount('body');
+    // Fetch the model counts.
+    const br = dataModel.rowCount('body');
+    const bc = dataModel.columnCount('body');
 
-  //   // Bail early if there is nothing to copy.
-  //   if (br === 0 || bc === 0) {
-  //     return;
-  //   }
+    // Bail early if there is nothing to save.
+    if (br === 0 || bc === 0) {
+      return;
+    }
 
-  //   // Unpack the selection.
-  //   let { r1, c1, r2, c2 } = selections[0];
+    // Unpack the selection.
+    let { r1, c1, r2, c2 } = selections[0];
 
-  //   // Clamp the selection to the model bounds.
-  //   r1 = Math.max(0, Math.min(r1, br - 1));
-  //   c1 = Math.max(0, Math.min(c1, bc - 1));
-  //   r2 = Math.max(0, Math.min(r2, br - 1));
-  //   c2 = Math.max(0, Math.min(c2, bc - 1));
+    // Clamp the selection to the model bounds.
+    r1 = Math.max(0, Math.min(r1, br - 1));
+    c1 = Math.max(0, Math.min(c1, bc - 1));
+    r2 = Math.max(0, Math.min(r2, br - 1));
+    c2 = Math.max(0, Math.min(c2, bc - 1));
 
-  //   // Ensure the limits are well-orderd.
-  //   if (r2 < r1) [r1, r2] = [r2, r1];
-  //   if (c2 < c1) [c1, c2] = [c2, c1];
+    // Ensure the limits are well-orderd.
+    if (r2 < r1) [r1, r2] = [r2, r1];
+    if (c2 < c1) [c1, c2] = [c2, c1];
 
-  //   // Fetch the header counts.
-  //   let rhc = dataModel.columnCount('row-header');
-  //   let chr = dataModel.rowCount('column-header');
+    // Fetch the header counts.
+    let rhc = dataModel.columnCount('row-header');
+    let chr = dataModel.rowCount('column-header');
 
-  //   // Unpack the copy config.
-  //   const separator = grid.copyConfig.separator;
-  //   const format = grid.copyConfig.format;
-  //   const headers = grid.copyConfig.headers;
-  //   const warningThreshold = grid.copyConfig.warningThreshold;
+    // Unpack the copy config.
+    const format = grid.copyConfig.format;
+    const headers = grid.copyConfig.headers;
+    // const warningThreshold = grid.copyConfig.warningThreshold;
 
-  //   // Compute the number of cells to be copied.
-  //   let rowCount = r2 - r1 + 1;
-  //   let colCount = c2 - c1 + 1;
-  //   switch (headers) {
-  //     case 'none':
-  //       rhc = 0;
-  //       chr = 0;
-  //       break;
-  //     case 'row':
-  //       chr = 0;
-  //       colCount += rhc;
-  //       break;
-  //     case 'column':
-  //       rhc = 0;
-  //       rowCount += chr;
-  //       break;
-  //     case 'all':
-  //       rowCount += chr;
-  //       colCount += rhc;
-  //       break;
-  //     default:
-  //       throw 'unreachable';
-  //   }
+    // Compute the number of cells to be copied.
+    let rowCount = r2 - r1 + 1;
+    let colCount = c2 - c1 + 1;
+    switch (headers) {
+      case 'none':
+        rhc = 0;
+        chr = 0;
+        break;
+      case 'row':
+        chr = 0;
+        colCount += rhc;
+        break;
+      case 'column':
+        rhc = 0;
+        rowCount += chr;
+        break;
+      case 'all':
+        rowCount += chr;
+        colCount += rhc;
+        break;
+      default:
+        throw 'unreachable';
+    }
 
-  //   // Compute the total cell count.
-  //   const cellCount = rowCount * colCount;
+    // Compute the total cell count.
+    // const cellCount = rowCount * colCount;
 
-  //   // Allow the user to cancel a large copy request.
-  //   if (cellCount > warningThreshold) {
-  //     console.log('copy');
-  //     const msg = `Copying ${cellCount} cells may take a while. Continue?`;
-  //     if (!window.confirm(msg)) {
-  //       return;
+    // // Allow the user to cancel a large copy request.
+    // if (cellCount > warningThreshold) {
+    //   console.log('copy');
+    //   const msg = `Copying ${cellCount} cells may take a while. Continue?`;
+    //   if (!window.confirm(msg)) {
+    //     return;
+    //   }
+    // }
+
+    // Set up the format args.
+    const args = {
+      region: 'body' as DataModel.CellRegion,
+      row: 0,
+      column: 0,
+      value: null as any,
+      metadata: {} as DataModel.Metadata,
+    };
+
+    // Allocate the array of rows.
+    const rows = new Array<string[]>(rowCount);
+
+    // Iterate over the rows.
+    for (let j = 0; j < rowCount; ++j) {
+      // Allocate the array of cells.
+      const cells = new Array<string>(colCount);
+
+      // Iterate over the columns.
+      for (let i = 0; i < colCount; ++i) {
+        // Set up the format variables.
+        let region: DataModel.CellRegion;
+        let row: number;
+        let column: number;
+
+        // Populate the format variables.
+        if (j < chr && i < rhc) {
+          region = 'corner-header';
+          row = j;
+          column = i;
+        } else if (j < chr) {
+          region = 'column-header';
+          row = j;
+          column = i - rhc + c1;
+        } else if (i < rhc) {
+          region = 'row-header';
+          row = j - chr + r1;
+          column = i;
+        } else {
+          region = 'body';
+          row = j - chr + r1;
+          column = i - rhc + c1;
+        }
+
+        // Populate the format args.
+        args.region = region;
+        args.row = row;
+        args.column = column;
+        args.value = dataModel.data(region, row, column);
+        args.metadata = dataModel.metadata(region, row, column);
+
+        // Format the cell.
+        cells[i] = format(args);
+      }
+
+      // Save the row of cells.
+      rows[j] = cells;
+    }
+
+    // Convert the cells into lines.
+    const lines = rows.map((cells) => cells.join(','));
+
+    // Convert the lines into text.
+    const text = lines.join('\n');
+
+    const blob = new Blob([text], { type: 'text/plain' });
+
+    // Create a link element, simulate a click, and remove link element
+    const a = document.createElement('a');
+    a.download = 'out.csv';
+    a.href = window.URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // getRowDataFromColumn(colIndex: number): void {
+  //   console.log('shut up');
+
+  //   const dataModel = this.grid.dataModel;
+
+  //   if (dataModel) {
+  //     // Assuming you want to get data from the 'body' region; adjust the region based on your usage
+  //     const rowCount = dataModel.rowCount('body');
+
+  //     const cells = new Array<string>(rowCount);
+
+  //     // Loop through each row and get the data
+  //     for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+  //       const rowData = dataModel.data('body', rowIndex, colIndex);
+  //       console.log('Row Data:', rowData);
+  //       // Do something with the row data...
+  //       cells.push(rowData);
   //     }
   //   }
-
-  //   // Set up the format args.
-  //   const args = {
-  //     region: 'body' as DataModel.CellRegion,
-  //     row: 0,
-  //     column: 0,
-  //     value: null as any,
-  //     metadata: {} as DataModel.Metadata,
-  //   };
-
-  //   // Allocate the array of rows.
-  //   const rows = new Array<string[]>(rowCount);
-
-  //   // Iterate over the rows.
-  //   for (let j = 0; j < rowCount; ++j) {
-  //     // Allocate the array of cells.
-  //     const cells = new Array<string>(colCount);
-
-  //     // Iterate over the columns.
-  //     for (let i = 0; i < colCount; ++i) {
-  //       // Set up the format variables.
-  //       let region: DataModel.CellRegion;
-  //       let row: number;
-  //       let column: number;
-
-  //       // Populate the format variables.
-  //       if (j < chr && i < rhc) {
-  //         region = 'corner-header';
-  //         row = j;
-  //         column = i;
-  //       } else if (j < chr) {
-  //         region = 'column-header';
-  //         row = j;
-  //         column = i - rhc + c1;
-  //       } else if (i < rhc) {
-  //         region = 'row-header';
-  //         row = j - chr + r1;
-  //         column = i;
-  //       } else {
-  //         region = 'body';
-  //         row = j - chr + r1;
-  //         column = i - rhc + c1;
-  //       }
-
-  //       // Populate the format args.
-  //       args.region = region;
-  //       args.row = row;
-  //       args.column = column;
-  //       args.value = dataModel.data(region, row, column);
-  //       args.metadata = dataModel.metadata(region, row, column);
-
-  //       // Format the cell.
-  //       cells[i] = format(args);
-  //     }
-
-  //     // Save the row of cells.
-  //     rows[j] = cells;
-  //   }
-
-  //   // Convert the cells into lines.
-  //   const lines = rows.map((cells) => cells.join(separator));
-
-  //   // Convert the lines into text.
-  //   const text = lines.join('\n');
-
-  //   // Copy the text to the clipboard.
-  //   navigator.clipboard.writeText(text);
-  //   // const textArea = document.createElement('textarea');
-  //   // textArea.innerHTML = text;
-
-  //   // // Text area has to be visible on page for copy without Clipboard API,
-  //   // // So we create an "invisible" element, add it to the body, then remove
-  //   // // when no longer needed.
-
-  //   // console.log('copy46');
-  //   // textArea.style.height = '0px';
-  //   // textArea.style.width = '0px';
-  //   // textArea.style.overflow = 'hidden';
-  //   // textArea.id = 'ipydatagrid-textarea';
-  //   // textArea.style.position = 'absolute';
-  //   // document.body.appendChild(textArea);
-  //   // textArea.select();
-  //   // console.log('copy47');
-  //   // document.execCommand('copy');
-  //   // document.body.removeChild(textArea);
   // }
 
   /**
@@ -1020,11 +1018,17 @@ export class FeatherGrid extends Widget {
         label: 'Copy Selection to Clipboard',
         mnemonic: -1,
         execute: () => {
-          // const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
           this.grid.copyToClipboard();
         },
       },
     );
+    commands.addCommand(FeatherGridContextMenu.CommandID.SaveSelectionAsCsv, {
+      label: 'Download Selected as CSV',
+      mnemonic: -1,
+      execute: () => {
+        this.downloadSelectedAsCsv();
+      },
+    });
     return commands;
   }
 
