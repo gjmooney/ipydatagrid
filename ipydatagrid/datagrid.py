@@ -7,6 +7,7 @@ from collections.abc import Iterator
 from copy import deepcopy
 from math import floor
 
+import jsonschema
 import numpy as np
 import pandas as pd
 from ipywidgets import CallbackDispatcher, DOMWidget, widget_serialization
@@ -17,6 +18,7 @@ from traitlets import (
     Instance,
     Int,
     List,
+    TraitError,
     Unicode,
     default,
     validate,
@@ -24,6 +26,16 @@ from traitlets import (
 
 from ._frontend import module_name, module_version
 from .cellrenderer import CellRenderer, TextRenderer
+
+copy_config_schema = {
+    "type": "object",
+    "properties": {
+        "headers": {"enum": ["none", "row", "column", "all"]},
+        "separator": {"type": "string"},
+        "warning_threshold": {"type": "number"},
+    },
+    "additionalProperties": False,
+}
 
 
 class SelectionIterator(Iterator):
@@ -637,6 +649,19 @@ class DataGrid(DOMWidget):
     def revert(self):
         """Revert all transformations."""
         self._transforms = []
+
+    @default("copy_config")
+    def _default_copy_config(self):
+        return dict(headers="none", separator="\t", warning_threshold=1e6)
+
+    @validate("copy_config")
+    def _validate_copy_config(self, proposal):
+        print(proposal["value"])
+        try:
+            jsonschema.validate(proposal["value"], copy_config_schema)
+        except jsonschema.ValidationError as e:
+            raise TraitError(e)
+        return proposal["value"]
 
     @default("default_renderer")
     def _default_renderer(self):
