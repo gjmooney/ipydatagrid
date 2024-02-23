@@ -176,6 +176,10 @@ export class FeatherGridContextMenu extends GridContextMenu {
           args: args,
         });
         this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.SaveAllAsCsv,
+          args: args,
+        });
+        this._menu.addItem({
           type: 'separator',
         });
         this._menu.addItem({
@@ -188,6 +192,10 @@ export class FeatherGridContextMenu extends GridContextMenu {
         });
         this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.ClearFiltersInAllColumns,
+          args: args,
+        });
+        this._menu.addItem({
+          command: FeatherGridContextMenu.CommandID.HideAllColumns,
           args: args,
         });
         break;
@@ -240,7 +248,9 @@ export namespace FeatherGridContextMenu {
     CopyToClipboard = 'copyToClipboard',
     CopySelectionToClipboard = 'copySelectionToClipboard',
     SaveSelectionAsCsv = 'saveSelectionAsCsv',
+    SaveAllAsCsv = 'saveAllAsCsv',
     ClearSelection = 'clearSelection',
+    HideAllColumns = 'hideAllColumns',
   }
 
   /**

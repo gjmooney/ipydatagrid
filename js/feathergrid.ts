@@ -591,6 +591,116 @@ export class FeatherGrid extends Widget {
     this._updateHeaderRenderer();
   }
 
+  downloadAllAsCsv(): void {
+    const grid = this.grid;
+    // Fetch the data model.
+    const dataModel = grid.dataModel;
+
+    // Bail early if there is no data model.
+    if (!dataModel) {
+      return;
+    }
+
+    console.log('grid.selectioModel', grid.selectionModel);
+
+    // Fetch the model counts.
+    const br = dataModel.rowCount('body');
+    const bc = dataModel.columnCount('body');
+
+    // Bail early if there is nothing to save.
+    if (br === 0 || bc === 0) {
+      return;
+    }
+
+    // Fetch the header counts.
+    const rhc = dataModel.columnCount('row-header');
+    const chr = dataModel.rowCount('column-header');
+
+    // Unpack the copy config.
+    const format = grid.copyConfig.format;
+
+    // Compute the number of cells to be copied.
+
+    const rowCount = br + chr;
+    const colCount = bc + rhc;
+
+    // Set up the format args.
+    const args = {
+      region: 'body' as DataModel.CellRegion,
+      row: 0,
+      column: 0,
+      value: null as any,
+      metadata: {} as DataModel.Metadata,
+    };
+
+    // Allocate the array of rows.
+    const rows = new Array<string[]>(rowCount);
+    console.log('rowCount', rowCount);
+    console.log('colCount', colCount);
+    console.log('br', br);
+    console.log('bc', bc);
+    // Iterate over the rows.
+    for (let j = 0; j < rowCount; ++j) {
+      // Allocate the array of cells.
+      const cells = new Array<string>(colCount);
+
+      // Iterate over the columns.
+      for (let i = 0; i < colCount; ++i) {
+        // Set up the format variables.
+        let region: DataModel.CellRegion;
+        let row: number;
+        let column: number;
+
+        // Populate the format variables.
+        if (j < chr && i < rhc) {
+          region = 'corner-header';
+          row = j;
+          column = i;
+        } else if (j < chr) {
+          region = 'column-header';
+          row = j;
+          column = i - rhc;
+        } else if (i < rhc) {
+          region = 'row-header';
+          row = j - chr;
+          column = i;
+        } else {
+          region = 'body';
+          row = j - chr;
+          column = i - rhc;
+        }
+
+        // Populate the format args.
+        args.region = region;
+        args.row = row;
+        args.column = column;
+        args.value = dataModel.data(region, row, column);
+        args.metadata = dataModel.metadata(region, row, column);
+
+        // Format the cell.
+        cells[i] = format(args);
+      }
+
+      // Save the row of cells.
+      rows[j] = cells;
+    }
+    // Convert the cells into lines.
+    const lines = rows.map((cells) => cells.join(','));
+
+    // Convert the lines into text.
+    const text = lines.join('\n');
+
+    const blob = new Blob([text], { type: 'text/plain' });
+
+    // Create a link element, simulate a click, and remove link element
+    const a = document.createElement('a');
+    a.download = 'out.csv';
+    a.href = window.URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   downloadSelectedAsCsv(): void {
     const grid = this.grid;
     // Fetch the data model.
@@ -1029,6 +1139,13 @@ export class FeatherGrid extends Widget {
         this.downloadSelectedAsCsv();
       },
     });
+    commands.addCommand(FeatherGridContextMenu.CommandID.SaveAllAsCsv, {
+      label: 'Download All as CSV',
+      mnemonic: -1,
+      execute: () => {
+        this.downloadAllAsCsv();
+      },
+    });
     commands.addCommand(FeatherGridContextMenu.CommandID.SortClear, {
       label: 'No Sort',
       mnemonic: 1,
@@ -1048,6 +1165,14 @@ export class FeatherGrid extends Widget {
         this.grid.selectionModel?.clear();
       },
     });
+    commands.addCommand(FeatherGridContextMenu.CommandID.HideAllColumns, {
+      label: 'Hide All Columns',
+      mnemonic: -1,
+      execute: () => {
+        this.grid.setHidden(true);
+      },
+    });
+
     return commands;
   }
 
