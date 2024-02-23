@@ -434,6 +434,15 @@ export class DataGridView extends DOMWidgetView {
       window.removeEventListener('resize', this.manageResizeEvent);
     });
 
+    // convert copy_config keys to camelCase for the constructor
+    const copyConfig = this.model.get('copy_config');
+    for (const key in copyConfig) {
+      if (copyConfig.hasOwnProperty(key)) {
+        copyConfig[camelCase(key)] = copyConfig[key];
+      }
+    }
+
+    console.log('copyConfig', copyConfig);
     this.grid = new FeatherGrid({
       defaultSizes: {
         rowHeight: this.model.get('base_row_size'),
@@ -449,7 +458,7 @@ export class DataGridView extends DOMWidgetView {
       //   separator: this.model.get('separator'),
       //   warningThreshold: this.model.get('warning_threshold'),
       // },
-      copyConfig: this.model.get('copy_config'),
+      copyConfig: copyConfig,
     });
 
     this.grid.columnWidths = this.model.get('column_widths');
