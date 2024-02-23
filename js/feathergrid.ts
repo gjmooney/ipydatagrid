@@ -591,117 +591,13 @@ export class FeatherGrid extends Widget {
     this._updateHeaderRenderer();
   }
 
-  downloadAllAsCsv(): void {
-    const grid = this.grid;
-    // Fetch the data model.
-    const dataModel = grid.dataModel;
+  downloadAsCsv(isSelection: boolean): void {
+    let rowCount, colCount;
+    let r1 = 0,
+      c1 = 0,
+      r2,
+      c2;
 
-    // Bail early if there is no data model.
-    if (!dataModel) {
-      return;
-    }
-
-    console.log('grid.selectioModel', grid.selectionModel);
-
-    // Fetch the model counts.
-    const br = dataModel.rowCount('body');
-    const bc = dataModel.columnCount('body');
-
-    // Bail early if there is nothing to save.
-    if (br === 0 || bc === 0) {
-      return;
-    }
-
-    // Fetch the header counts.
-    const rhc = dataModel.columnCount('row-header');
-    const chr = dataModel.rowCount('column-header');
-
-    // Unpack the copy config.
-    const format = grid.copyConfig.format;
-
-    // Compute the number of cells to be copied.
-
-    const rowCount = br + chr;
-    const colCount = bc + rhc;
-
-    // Set up the format args.
-    const args = {
-      region: 'body' as DataModel.CellRegion,
-      row: 0,
-      column: 0,
-      value: null as any,
-      metadata: {} as DataModel.Metadata,
-    };
-
-    // Allocate the array of rows.
-    const rows = new Array<string[]>(rowCount);
-    console.log('rowCount', rowCount);
-    console.log('colCount', colCount);
-    console.log('br', br);
-    console.log('bc', bc);
-    // Iterate over the rows.
-    for (let j = 0; j < rowCount; ++j) {
-      // Allocate the array of cells.
-      const cells = new Array<string>(colCount);
-
-      // Iterate over the columns.
-      for (let i = 0; i < colCount; ++i) {
-        // Set up the format variables.
-        let region: DataModel.CellRegion;
-        let row: number;
-        let column: number;
-
-        // Populate the format variables.
-        if (j < chr && i < rhc) {
-          region = 'corner-header';
-          row = j;
-          column = i;
-        } else if (j < chr) {
-          region = 'column-header';
-          row = j;
-          column = i - rhc;
-        } else if (i < rhc) {
-          region = 'row-header';
-          row = j - chr;
-          column = i;
-        } else {
-          region = 'body';
-          row = j - chr;
-          column = i - rhc;
-        }
-
-        // Populate the format args.
-        args.region = region;
-        args.row = row;
-        args.column = column;
-        args.value = dataModel.data(region, row, column);
-        args.metadata = dataModel.metadata(region, row, column);
-
-        // Format the cell.
-        cells[i] = format(args);
-      }
-
-      // Save the row of cells.
-      rows[j] = cells;
-    }
-    // Convert the cells into lines.
-    const lines = rows.map((cells) => cells.join(','));
-
-    // Convert the lines into text.
-    const text = lines.join('\n');
-
-    const blob = new Blob([text], { type: 'text/plain' });
-
-    // Create a link element, simulate a click, and remove link element
-    const a = document.createElement('a');
-    a.download = 'out.csv';
-    a.href = window.URL.createObjectURL(blob);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-
-  downloadSelectedAsCsv(): void {
     const grid = this.grid;
     // Fetch the data model.
     const dataModel = grid.dataModel;
@@ -719,20 +615,6 @@ export class FeatherGrid extends Widget {
       return;
     }
 
-    // Coerce the selections to an array.
-    const selections = Array.from(selectionModel.selections());
-
-    // Bail early if there are no selections.
-    if (selections.length === 0) {
-      return;
-    }
-
-    // Alert that multiple selections cannot be saved.
-    if (selections.length > 1) {
-      alert('Cannot save multiple grid selections.');
-      return;
-    }
-
     // Fetch the model counts.
     const br = dataModel.rowCount('body');
     const bc = dataModel.columnCount('body');
@@ -742,19 +624,6 @@ export class FeatherGrid extends Widget {
       return;
     }
 
-    // Unpack the selection.
-    let { r1, c1, r2, c2 } = selections[0];
-
-    // Clamp the selection to the model bounds.
-    r1 = Math.max(0, Math.min(r1, br - 1));
-    c1 = Math.max(0, Math.min(c1, bc - 1));
-    r2 = Math.max(0, Math.min(r2, br - 1));
-    c2 = Math.max(0, Math.min(c2, bc - 1));
-
-    // Ensure the limits are well-orderd.
-    if (r2 < r1) [r1, r2] = [r2, r1];
-    if (c2 < c1) [c1, c2] = [c2, c1];
-
     // Fetch the header counts.
     let rhc = dataModel.columnCount('row-header');
     let chr = dataModel.rowCount('column-header');
@@ -762,43 +631,63 @@ export class FeatherGrid extends Widget {
     // Unpack the copy config.
     const format = grid.copyConfig.format;
     const headers = grid.copyConfig.headers;
-    // const warningThreshold = grid.copyConfig.warningThreshold;
 
-    // Compute the number of cells to be copied.
-    let rowCount = r2 - r1 + 1;
-    let colCount = c2 - c1 + 1;
-    switch (headers) {
-      case 'none':
-        rhc = 0;
-        chr = 0;
-        break;
-      case 'row':
-        chr = 0;
-        colCount += rhc;
-        break;
-      case 'column':
-        rhc = 0;
-        rowCount += chr;
-        break;
-      case 'all':
-        rowCount += chr;
-        colCount += rhc;
-        break;
-      default:
-        throw 'unreachable';
+    if (isSelection) {
+      // Coerce the selections to an array.
+      const selections = Array.from(selectionModel.selections());
+
+      // Bail early if there are no selections.
+      if (selections.length === 0) {
+        return;
+      }
+
+      // Alert that multiple selections cannot be saved.
+      if (selections.length > 1) {
+        alert('Cannot save multiple grid selections.');
+        return;
+      }
+
+      // Unpack the selection.
+      ({ r1, c1, r2, c2 } = selections[0]);
+
+      // Clamp the selection to the model bounds.
+      r1 = Math.max(0, Math.min(r1, br - 1));
+      c1 = Math.max(0, Math.min(c1, bc - 1));
+      r2 = Math.max(0, Math.min(r2, br - 1));
+      c2 = Math.max(0, Math.min(c2, bc - 1));
+
+      // Ensure the limits are well-orderd.
+      if (r2 < r1) [r1, r2] = [r2, r1];
+      if (c2 < c1) [c1, c2] = [c2, c1];
+
+      // Compute the number of cells to be saved.
+      rowCount = r2 - r1 + 1;
+      colCount = c2 - c1 + 1;
+      switch (headers) {
+        case 'none':
+          rhc = 0;
+          chr = 0;
+          break;
+        case 'row':
+          chr = 0;
+          colCount += rhc;
+          break;
+        case 'column':
+          rhc = 0;
+          rowCount += chr;
+          break;
+        case 'all':
+          rowCount += chr;
+          colCount += rhc;
+          break;
+        default:
+          throw 'unreachable';
+      }
+    } else {
+      // Saving all the cells, headers included
+      rowCount = br + chr;
+      colCount = bc + rhc;
     }
-
-    // Compute the total cell count.
-    // const cellCount = rowCount * colCount;
-
-    // // Allow the user to cancel a large copy request.
-    // if (cellCount > warningThreshold) {
-    //   console.log('copy');
-    //   const msg = `Copying ${cellCount} cells may take a while. Continue?`;
-    //   if (!window.confirm(msg)) {
-    //     return;
-    //   }
-    // }
 
     // Set up the format args.
     const args = {
@@ -864,7 +753,7 @@ export class FeatherGrid extends Widget {
     // Convert the lines into text.
     const text = lines.join('\n');
 
-    const blob = new Blob([text], { type: 'text/plain' });
+    const blob = new Blob([text], { type: 'text/csv' });
 
     // Create a link element, simulate a click, and remove link element
     const a = document.createElement('a');
@@ -1133,17 +1022,17 @@ export class FeatherGrid extends Widget {
       },
     );
     commands.addCommand(FeatherGridContextMenu.CommandID.SaveSelectionAsCsv, {
-      label: 'Download Selected as CSV',
+      label: 'Download Selection as CSV',
       mnemonic: -1,
       execute: () => {
-        this.downloadSelectedAsCsv();
+        this.downloadAsCsv(true);
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.SaveAllAsCsv, {
       label: 'Download All as CSV',
       mnemonic: -1,
       execute: () => {
-        this.downloadAllAsCsv();
+        this.downloadAsCsv(false);
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.SortClear, {
