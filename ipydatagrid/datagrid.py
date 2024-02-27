@@ -7,6 +7,7 @@ from collections.abc import Iterator
 from copy import deepcopy
 from math import floor
 
+import jsonschema
 import numpy as np
 import pandas as pd
 from ipywidgets import CallbackDispatcher, DOMWidget, widget_serialization
@@ -17,6 +18,7 @@ from traitlets import (
     Instance,
     Int,
     List,
+    TraitError,
     Unicode,
     default,
     validate,
@@ -25,6 +27,15 @@ from traitlets import (
 from ._frontend import module_name, module_version
 from .cellrenderer import CellRenderer, TextRenderer
 
+copy_config_schema = {
+    "type": "object",
+    "properties": {
+        "headers": {"enum": ["none", "row", "column", "all"]},
+        "separator": {"type": "string"},
+        "warning_threshold": {"type": "number"},
+    },
+    "additionalProperties": False,
+}
 
 class SelectionIterator(Iterator):
     def __init__(self, selections):
@@ -334,6 +345,8 @@ class DataGrid(DOMWidget):
     base_column_size = Int(64).tag(sync=True)
     base_row_header_size = Int(64).tag(sync=True)
     base_column_header_size = Int(20).tag(sync=True)
+
+    copy_config = Dict(allow_none=True).tag(sync=True, **_widgets_dict_serialization)
 
     header_visibility = Enum(
         default_value="all", values=["all", "row", "column", "none"]
@@ -865,3 +878,16 @@ class DataGrid(DOMWidget):
         if column is None:
             return None
         return data["data"][row_index][column]
+
+    @default("copy_config")
+    def _default_copy_config(self):
+        return dict(headers="none", separator="\t", warning_threshold=1e6)
+
+    @validate("copy_config")
+    def _validate_copy_config(self, proposal):
+        print(proposal["value"])
+        try:
+            jsonschema.validate(proposal["value"], copy_config_schema)
+        except jsonschema.ValidationError as e:
+            raise TraitError(e)
+        return proposal["value"]

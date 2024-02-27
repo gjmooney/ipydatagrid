@@ -123,6 +123,12 @@ export class FeatherGrid extends Widget {
     }
     this._headerVisibility = options.headerVisibility || this._headerVisibility;
 
+    // Combine defaults with user settings
+    options.copyConfig = {
+      ...DataGrid.defaultCopyConfig,
+      ...options.copyConfig,
+    };
+
     this._createGrid(options);
 
     this._defaultRenderer = new TextRenderer({
