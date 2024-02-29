@@ -871,6 +871,22 @@ export class FeatherGrid extends Widget {
     });
   }
 
+  private _updateAlignment(
+    columnName: string,
+    align: TextRenderer.HorizontalAlignment,
+  ) {
+    const updatedRenderers = {
+      ...this.renderers,
+    };
+
+    //@ts-ignore
+    updatedRenderers[columnName]['horizontalAlignment'] = align;
+
+    this.backboneModel.save_changes();
+
+    this.renderers = updatedRenderers;
+  }
+
   private _createCommandRegistry(): CommandRegistry {
     const commands = new CommandRegistry();
     commands.addCommand(FeatherGridContextMenu.CommandID.SortAscending, {
@@ -1032,6 +1048,86 @@ export class FeatherGrid extends Widget {
       mnemonic: -1,
       execute: () => {
         this.grid.selectionModel?.clear();
+      },
+    });
+    commands.addCommand(FeatherGridContextMenu.CommandID.AlignLeft, {
+      label: 'Align Left',
+      mnemonic: -1,
+      execute: (args) => {
+        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+        // const align: TextRenderer.HorizontalAlignment = 'left';
+        const columnName: string = this.dataModel.metadata(
+          commandArgs.region,
+          commandArgs.rowIndex,
+          commandArgs.columnIndex,
+        )['name'];
+
+        // const updatedRenderers = {
+        //   ...this._renderers,
+        // };
+
+        // (
+        //   updatedRenderers[columnName] as TextRenderer.IOptions
+        // ).horizontalAlignment = align;
+
+        // this.backboneModel.save_changes();
+
+        // this.renderers = updatedRenderers;
+
+        this._updateAlignment(columnName, 'left');
+      },
+    });
+    commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {
+      label: 'Align Center',
+      mnemonic: -1,
+      execute: (args) => {
+        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+        // const align: TextRenderer.HorizontalAlignment = 'center';
+        const columnName: string = this.dataModel.metadata(
+          commandArgs.region,
+          commandArgs.rowIndex,
+          commandArgs.columnIndex,
+        )['name'];
+
+        // const updatedRenderers = {
+        //   ...this._renderers,
+        // };
+
+        // (
+        //   updatedRenderers[columnName] as TextRenderer.IOptions
+        // ).horizontalAlignment = align;
+        // this.backboneModel.save_changes();
+
+        // this.renderers = updatedRenderers;
+
+        this._updateAlignment(columnName, 'center');
+      },
+    });
+    commands.addCommand(FeatherGridContextMenu.CommandID.AlignRight, {
+      label: 'Align Right',
+      mnemonic: -1,
+      execute: (args) => {
+        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+        // const align: TextRenderer.HorizontalAlignment = 'right';
+        const columnName: string = this.dataModel.metadata(
+          commandArgs.region,
+          commandArgs.rowIndex,
+          commandArgs.columnIndex,
+        )['name'];
+
+        // const updatedRenderers = {
+        //   ...this._renderers,
+        // };
+
+        // (
+        //   updatedRenderers[columnName] as TextRenderer.IOptions
+        // ).horizontalAlignment = align;
+
+        // this.backboneModel.save_changes();
+
+        // this.renderers = updatedRenderers;
+
+        this._updateAlignment(columnName, 'right');
       },
     });
 
