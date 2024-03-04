@@ -22,6 +22,12 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 
 import { DataGridModel as BackBoneModel } from './datagrid';
 
+import {
+  DOMWidgetModel,
+  ISerializers,
+  unpack_models,
+} from '@jupyter-widgets/base';
+
 import '@lumino/default-theme/style/datagrid.css';
 import '../style/feathergrid.css';
 
@@ -108,6 +114,12 @@ const themeVariables: Map<string, string[]> = new Map([
 ]);
 
 export class FeatherGrid extends Widget {
+  static serializers: ISerializers = {
+    ...DOMWidgetModel.serializers,
+
+    renderers: { deserialize: unpack_models as any },
+  };
+
   constructor(options: DataGrid.IOptions = {}) {
     super();
     this.addClass('ipydatagrid-widget');
@@ -876,7 +888,7 @@ export class FeatherGrid extends Widget {
     console.log('shush');
 
     console.log('starting await in method');
-    return this.backboneModel.widget_manager
+    this.backboneModel.widget_manager
       .new_widget({
         model_name: 'TextRendererModel',
         model_module: MODULE_NAME,
@@ -888,7 +900,10 @@ export class FeatherGrid extends Widget {
       .then((model) => {
         // console.log('made the model');
         // console.log('modelONE', model);
-        console.log('finishing await in method');
+        //@ts-ignore
+        console.log('expectedID', model._expectedEchoMsgIds);
+        //@ts-ignore
+        model._expectedEchoMsgIds.clear();
 
         model.set('horizontal_alignment', 'right');
         // this.renderers['Horsepower'] = model;
@@ -896,8 +911,21 @@ export class FeatherGrid extends Widget {
         model.save_changes();
 
         console.log('exiting method');
+        console.log('finishing await in method');
 
         return model;
+      })
+      .then((model) => {
+        console.log('second model', model);
+        const newRend = {
+          ...this.backboneModel.get('renderers'),
+          Horsepower: model,
+        };
+        this.backboneModel.set('renderers', newRend);
+      })
+      .finally(() => {
+        console.log('finally');
+        // this.backboneModel.save_changes();
       });
   }
 
@@ -1085,27 +1113,8 @@ export class FeatherGrid extends Widget {
       mnemonic: -1,
       execute: (args) => {
         console.log('pre', this.backboneModel.get('renderers'));
-        this._createNewAlignmentWidget()
-          .then((model) => {
-            console.log('starting call back in execute');
-            console.log('model in exec', model);
-            const newRend = {
-              ...this.backboneModel.get('renderers'),
-              Horsepower: model,
-            };
-            this.backboneModel.set('renderers', newRend);
-            this.backboneModel.save_changes();
-            console.log('execute render', this.backboneModel.get('renderers'));
+        this._createNewAlignmentWidget();
 
-            console.log('this.grid.cellRenderers', this.grid.cellRenderers);
-
-            console.log('holy fuck', this.backboneModel.get(`_data`));
-            console.log('finishing call back in execute');
-          })
-          .finally(() => {
-            console.log('finally');
-            // this.backboneModel.save_changes();
-          });
         console.log('this.renderers', this.renderers);
         // console.log('post2', this.backboneModel.get('renderers'));
       },

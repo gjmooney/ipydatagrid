@@ -742,6 +742,8 @@ export class DataGridView extends DOMWidgetView {
     }
     console.log('renderers in update grid renderes', renderers)
     this.grid.renderers = renderers;
+
+    this.model.save_changes()
   }
 
   private _initializeTheme() {
