@@ -100,6 +100,40 @@ export class DataGridModel extends DOMWidgetModel {
     });
   }
 
+  createTextRenderer() {
+    console.log('create text renderer')
+    return this.widget_manager.new_widget({
+      model_name: 'TextRendererModel',
+        model_module: MODULE_NAME,
+        model_module_version: MODULE_VERSION,
+        view_name: 'TextRendererView',
+        view_module: MODULE_NAME,
+        view_module_version: MODULE_VERSION,
+    }).then((model) => {
+
+      model.set('horizontal_alignment', 'right');
+      
+      model.save_changes();
+
+      console.log('model', model)
+
+      // const newRend = {
+      //   ...this.get('renderers'),
+      //   Horsepower: model,
+      // };
+
+      // console.log('newRend', newRend)
+
+      // this.set('renderers', newRend)
+
+      // console.log('this get renderers', this.get('renderers'))
+      return model
+
+    }).finally(() => {
+      console.log('finally')
+    })
+  }
+
   updateDataSync(sender: any, msg: any) {
     switch (msg.type) {
       case 'row-indices-updated':
@@ -527,7 +561,7 @@ export class DataGridView extends DOMWidgetView {
       () => {
         this.updateRenderers()
           .then(this.updateGridStyle.bind(this))
-          .then(this.updateGridRenderers.bind(this));
+          .then(this.updateGridRenderers.bind(this))
       },
       this,
     );
@@ -743,7 +777,6 @@ export class DataGridView extends DOMWidgetView {
     console.log('renderers in update grid renderes', renderers)
     this.grid.renderers = renderers;
 
-    this.model.save_changes()
   }
 
   private _initializeTheme() {

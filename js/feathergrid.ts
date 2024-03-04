@@ -884,11 +884,25 @@ export class FeatherGrid extends Widget {
     });
   }
 
+  private blahblah(model: any) {
+    const newRend = {
+      ...this.backboneModel.get('renderers'),
+      Horsepower: model,
+    };
+
+    console.log('newRend', newRend);
+
+    this.backboneModel.set('renderers', newRend);
+    this.backboneModel.save_changes();
+
+    console.log('this get renderers', this.backboneModel.get('renderers'));
+  }
+  //@ts-ignore
   private _createNewAlignmentWidget() {
     console.log('shush');
 
     console.log('starting await in method');
-    this.backboneModel.widget_manager
+    return this.backboneModel.widget_manager
       .new_widget({
         model_name: 'TextRendererModel',
         model_module: MODULE_NAME,
@@ -1111,11 +1125,15 @@ export class FeatherGrid extends Widget {
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignLeft, {
       label: 'Align Left',
       mnemonic: -1,
-      execute: (args) => {
+      execute: async (args) => {
         console.log('pre', this.backboneModel.get('renderers'));
-        this._createNewAlignmentWidget();
+        const loco = await this.backboneModel.createTextRenderer();
 
-        console.log('this.renderers', this.renderers);
+        loco.save_changes();
+        console.log('loco', loco);
+        // this._createNewAlignmentWidget();
+        this.blahblah(loco);
+        // console.log('this.renderers', this.renderers);
         // console.log('post2', this.backboneModel.get('renderers'));
       },
     });
