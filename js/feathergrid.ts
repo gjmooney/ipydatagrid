@@ -18,6 +18,7 @@ import { ViewBasedJSONModel } from './core/viewbasedjsonmodel';
 import { KeyHandler } from './keyhandler';
 import { MouseHandler as FeatherGridMouseHandler } from './mousehandler';
 import { Theme } from './utils';
+import { MODULE_NAME, MODULE_VERSION } from './version';
 
 import { DataGridModel as BackBoneModel } from './datagrid';
 
@@ -871,6 +872,35 @@ export class FeatherGrid extends Widget {
     });
   }
 
+  private _createNewAlignmentWidget() {
+    console.log('shush');
+
+    console.log('starting await in method');
+    return this.backboneModel.widget_manager
+      .new_widget({
+        model_name: 'TextRendererModel',
+        model_module: MODULE_NAME,
+        model_module_version: MODULE_VERSION,
+        view_name: 'TextRendererView',
+        view_module: MODULE_NAME,
+        view_module_version: MODULE_VERSION,
+      })
+      .then((model) => {
+        // console.log('made the model');
+        // console.log('modelONE', model);
+        console.log('finishing await in method');
+
+        model.set('horizontal_alignment', 'right');
+        // this.renderers['Horsepower'] = model;
+        // this.backboneModel.set;
+        model.save_changes();
+
+        console.log('exiting method');
+
+        return model;
+      });
+  }
+
   private _updateAlignment(
     columnName: string,
     align: TextRenderer.HorizontalAlignment,
@@ -1054,40 +1084,43 @@ export class FeatherGrid extends Widget {
       label: 'Align Left',
       mnemonic: -1,
       execute: (args) => {
-        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
-        // const align: TextRenderer.HorizontalAlignment = 'left';
-        const columnName: string = this.dataModel.metadata(
-          commandArgs.region,
-          commandArgs.rowIndex,
-          commandArgs.columnIndex,
-        )['name'];
+        console.log('pre', this.backboneModel.get('renderers'));
+        this._createNewAlignmentWidget()
+          .then((model) => {
+            console.log('starting call back in execute');
+            console.log('model in exec', model);
+            const newRend = {
+              ...this.backboneModel.get('renderers'),
+              Horsepower: model,
+            };
+            this.backboneModel.set('renderers', newRend);
+            this.backboneModel.save_changes();
+            console.log('execute render', this.backboneModel.get('renderers'));
 
-        // const updatedRenderers = {
-        //   ...this._renderers,
-        // };
+            console.log('this.grid.cellRenderers', this.grid.cellRenderers);
 
-        // (
-        //   updatedRenderers[columnName] as TextRenderer.IOptions
-        // ).horizontalAlignment = align;
-
-        // this.backboneModel.save_changes();
-
-        // this.renderers = updatedRenderers;
-
-        this._updateAlignment(columnName, 'left');
+            console.log('holy fuck', this.backboneModel.get(`_data`));
+            console.log('finishing call back in execute');
+          })
+          .finally(() => {
+            console.log('finally');
+            // this.backboneModel.save_changes();
+          });
+        console.log('this.renderers', this.renderers);
+        // console.log('post2', this.backboneModel.get('renderers'));
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {
       label: 'Align Center',
       mnemonic: -1,
       execute: (args) => {
-        const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
-        // const align: TextRenderer.HorizontalAlignment = 'center';
-        const columnName: string = this.dataModel.metadata(
-          commandArgs.region,
-          commandArgs.rowIndex,
-          commandArgs.columnIndex,
-        )['name'];
+        // const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
+        // // const align: TextRenderer.HorizontalAlignment = 'center';
+        // const columnName: string = this.dataModel.metadata(
+        //   commandArgs.region,
+        //   commandArgs.rowIndex,
+        //   commandArgs.columnIndex,
+        // )['name'];
 
         // const updatedRenderers = {
         //   ...this._renderers,
@@ -1099,8 +1132,12 @@ export class FeatherGrid extends Widget {
         // this.backboneModel.save_changes();
 
         // this.renderers = updatedRenderers;
+        console.log('model renderers', this.backboneModel.get('renderers'));
+        console.log('this.datagrid.cellRenderers', this.grid.cellRenderers);
+        console.log('views', this.backboneModel.views);
+        this.backboneModel.save_changes();
 
-        this._updateAlignment(columnName, 'center');
+        // this._updateAlignment(columnName, 'center');
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignRight, {
