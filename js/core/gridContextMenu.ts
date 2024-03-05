@@ -128,7 +128,6 @@ export class FeatherGridContextMenu extends GridContextMenu {
         this._menu.addItem({
           type: 'separator',
         });
-
         this._menu.addItem({
           command: FeatherGridContextMenu.CommandID.OpenFilterByConditionDialog,
           args: args,
