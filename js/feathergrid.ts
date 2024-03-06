@@ -1127,14 +1127,56 @@ export class FeatherGrid extends Widget {
       mnemonic: -1,
       execute: async (args) => {
         console.log('pre', this.backboneModel.get('renderers'));
-        const loco = await this.backboneModel.createTextRenderer();
+        // const loco = await this.backboneModel.createTextRenderer();
 
-        loco.save_changes();
-        console.log('loco', loco);
+        // loco.save_changes();
+        // console.log('loco', loco);
         // this._createNewAlignmentWidget();
-        this.blahblah(loco);
+        // this.blahblah(loco);
         // console.log('this.renderers', this.renderers);
         // console.log('post2', this.backboneModel.get('renderers'));
+
+        return this.backboneModel.widget_manager
+          .new_widget({
+            model_name: 'TextRendererModel',
+            model_module: MODULE_NAME,
+            model_module_version: MODULE_VERSION,
+            view_name: 'TextRendererView',
+            view_module: MODULE_NAME,
+            view_module_version: MODULE_VERSION,
+          })
+          .then((model) => {
+            model.set('horizontal_alignment', 'right');
+
+            // model.save_changes();
+
+            console.log('model', model);
+
+            const newRend = {
+              ...this.backboneModel.get('renderers'),
+              Horsepower: model,
+            };
+
+            console.log('newRend', newRend);
+
+            this.backboneModel.set('renderers', newRend);
+            // this.backboneModel.save_changes();
+
+            // const newRend = {
+            //   ...this.get('renderers'),
+            //   Horsepower: model,
+            // };
+
+            // console.log('newRend', newRend)
+
+            // this.set('renderers', newRend)
+
+            // console.log('this get renderers', this.get('renderers'))
+            return model;
+          })
+          .finally(() => {
+            console.log('finally');
+          });
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {

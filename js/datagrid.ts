@@ -117,6 +117,17 @@ export class DataGridModel extends DOMWidgetModel {
 
       console.log('model', model)
 
+      const newRend = {
+        ...this.get('renderers'),
+        Horsepower: model,
+      };
+  
+      console.log('newRend', newRend);
+  
+      this.set('renderers', newRend);
+      this.save_changes();
+  
+
       // const newRend = {
       //   ...this.get('renderers'),
       //   Horsepower: model,
@@ -811,13 +822,10 @@ export class DataGridView extends DOMWidgetView {
 
 export {
   BarRendererModel,
-  BarRendererView,
-  ImageRendererModel,
-  ImageRendererView,
-  HyperlinkRendererModel,
-  HyperlinkRendererView,
-  TextRendererModel,
-  TextRendererView,
+  BarRendererView, HyperlinkRendererModel,
+  HyperlinkRendererView, ImageRendererModel,
+  ImageRendererView, TextRendererModel,
+  TextRendererView
 } from './cellrenderer';
 export { VegaExprModel, VegaExprView } from './vegaexpr';
 
