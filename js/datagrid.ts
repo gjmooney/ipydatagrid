@@ -101,7 +101,6 @@ export class DataGridModel extends DOMWidgetModel {
   }
 
   createTextRenderer() {
-    console.log('create text renderer')
     return this.widget_manager.new_widget({
       model_name: 'TextRendererModel',
         model_module: MODULE_NAME,
@@ -115,7 +114,6 @@ export class DataGridModel extends DOMWidgetModel {
       
       model.save_changes();
 
-      console.log('model', model)
 
       const newRend = {
         ...this.get('renderers'),
@@ -626,7 +624,6 @@ export class DataGridView extends DOMWidgetView {
   }
 
   private updateRenderers() {
-    console.log('update renderers')
     // Unlisten to previous renderers
     if (this.default_renderer) {
       this.stopListening(this.default_renderer, 'renderer-changed');
@@ -697,18 +694,13 @@ export class DataGridView extends DOMWidgetView {
     _.each(
       this.model.get('renderers'),
       (model: CellRendererModel, key: string) => {
-        console.log(`this.model.get('renderers') update`, this.model.get('renderers'))
-        console.log('model in upate', model)
 
         renderer_promises[key] = this.create_child_view(model);
-        console.log("is it here?")
       },
     );
-    console.log('update renderes pre push')
     promises.push(
       resolvePromisesDict(renderer_promises).then(
         (rendererViews: Dict<CellRendererView>) => {
-          console.log('rendererViews', rendererViews)
           this.renderers = rendererViews;
 
           for (const key in rendererViews) {
@@ -742,7 +734,6 @@ export class DataGridView extends DOMWidgetView {
   }
 
   private updateGridRenderers() {
-    console.log('update grid renderers')
     let defaultRenderer = this.default_renderer.renderer;
     if (
       this.grid.grid.style.backgroundColor !== Theme.getBackgroundColor() ||
@@ -785,7 +776,6 @@ export class DataGridView extends DOMWidgetView {
     if (cornerHeaderRenderer) {
       this.grid.cornerHeaderRenderer = cornerHeaderRenderer;
     }
-    console.log('renderers in update grid renderes', renderers)
     this.grid.renderers = renderers;
 
   }

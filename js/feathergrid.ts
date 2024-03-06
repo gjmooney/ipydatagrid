@@ -897,11 +897,7 @@ export class FeatherGrid extends Widget {
 
     console.log('this get renderers', this.backboneModel.get('renderers'));
   }
-  //@ts-ignore
   private _createNewAlignmentWidget() {
-    console.log('shush');
-
-    console.log('starting await in method');
     return this.backboneModel.widget_manager
       .new_widget({
         model_name: 'TextRendererModel',
@@ -912,34 +908,9 @@ export class FeatherGrid extends Widget {
         view_module_version: MODULE_VERSION,
       })
       .then((model) => {
-        // console.log('made the model');
-        // console.log('modelONE', model);
-        //@ts-ignore
-        console.log('expectedID', model._expectedEchoMsgIds);
-        //@ts-ignore
-        model._expectedEchoMsgIds.clear();
-
         model.set('horizontal_alignment', 'right');
-        // this.renderers['Horsepower'] = model;
-        // this.backboneModel.set;
         model.save_changes();
-
-        console.log('exiting method');
-        console.log('finishing await in method');
-
         return model;
-      })
-      .then((model) => {
-        console.log('second model', model);
-        const newRend = {
-          ...this.backboneModel.get('renderers'),
-          Horsepower: model,
-        };
-        this.backboneModel.set('renderers', newRend);
-      })
-      .finally(() => {
-        console.log('finally');
-        // this.backboneModel.save_changes();
       });
   }
 
@@ -1126,57 +1097,21 @@ export class FeatherGrid extends Widget {
       label: 'Align Left',
       mnemonic: -1,
       execute: async (args) => {
-        console.log('pre', this.backboneModel.get('renderers'));
-        // const loco = await this.backboneModel.createTextRenderer();
+        this._createNewAlignmentWidget().then((model) => {
+          const newRend = {
+            ...this.backboneModel.get('renderers'),
+            Horsepower: model,
+          };
 
-        // loco.save_changes();
-        // console.log('loco', loco);
-        // this._createNewAlignmentWidget();
-        // this.blahblah(loco);
-        // console.log('this.renderers', this.renderers);
-        // console.log('post2', this.backboneModel.get('renderers'));
+          console.log('newRend', newRend);
 
-        return this.backboneModel.widget_manager
-          .new_widget({
-            model_name: 'TextRendererModel',
-            model_module: MODULE_NAME,
-            model_module_version: MODULE_VERSION,
-            view_name: 'TextRendererView',
-            view_module: MODULE_NAME,
-            view_module_version: MODULE_VERSION,
-          })
-          .then((model) => {
-            model.set('horizontal_alignment', 'right');
-
-            // model.save_changes();
-
-            console.log('model', model);
-
-            const newRend = {
-              ...this.backboneModel.get('renderers'),
-              Horsepower: model,
-            };
-
-            console.log('newRend', newRend);
-
-            this.backboneModel.set('renderers', newRend);
-            // this.backboneModel.save_changes();
-
-            // const newRend = {
-            //   ...this.get('renderers'),
-            //   Horsepower: model,
-            // };
-
-            // console.log('newRend', newRend)
-
-            // this.set('renderers', newRend)
-
-            // console.log('this get renderers', this.get('renderers'))
-            return model;
-          })
-          .finally(() => {
-            console.log('finally');
-          });
+          this.backboneModel.set('renderers', newRend);
+          console.log(
+            `this.backboneModel.get('renderers')`,
+            this.backboneModel.get('renderers'),
+          );
+          this.backboneModel.save_changes();
+        });
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {
