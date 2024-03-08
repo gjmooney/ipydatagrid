@@ -318,6 +318,29 @@ export class DataGridModel extends DOMWidgetModel {
     return this.get('_data');
   }
 
+  createWidget() {
+    const nw = this.widget_manager
+      .new_widget({
+        model_name: 'TextRendererModel',
+        model_module: MODULE_NAME,
+        model_module_version: MODULE_VERSION,
+        view_name: 'TextRendererView',
+        view_module: MODULE_NAME,
+        view_module_version: MODULE_VERSION,
+        model_id: '3232323232'
+      })
+      .then((model) => {
+        // model.set('horizontal_alignment', 'right');
+        // model.save_changes();
+        console.log('model', model)
+        return model;
+      }).catch(() => {
+        console.log('error')
+      });
+
+      
+  }
+
   static serializers: ISerializers = {
     ...DOMWidgetModel.serializers,
     transforms: { deserialize: unpack_models as any },

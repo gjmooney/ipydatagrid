@@ -909,8 +909,8 @@ export class FeatherGrid extends Widget {
         view_module_version: MODULE_VERSION,
       })
       .then((model) => {
-        model.set('horizontal_alignment', 'right');
-        model.save_changes();
+        // model.set('horizontal_alignment', 'right');
+        // model.save_changes();
         return model;
       });
   }
@@ -1098,23 +1098,22 @@ export class FeatherGrid extends Widget {
       label: 'Align Left',
       mnemonic: -1,
       execute: (args) => {
-        this._createNewAlignmentWidget().then((model) => {
-          console.log('model', model);
-          const newRend = {
-            ...this.backboneModel.get('renderers'),
-            Horsepower: model,
-          };
-
-          console.log('newRend', newRend);
-
-          this.backboneModel.set('renderers', newRend);
-          console.log(
-            `this.backboneModel.get('renderers')`,
-            this.backboneModel.get('renderers'),
-          );
-          console.log('print');
-          this.backboneModel.save_changes();
-        });
+        // this._createNewAlignmentWidget().then((model) => {
+        //   // console.log('model', model);
+        //   // const newRend = {
+        //   //   ...this.backboneModel.get('renderers'),
+        //   //   Horsepower: model,
+        //   // };
+        //   // console.log('newRend', newRend);
+        //   // this.backboneModel.set('renderers', newRend);
+        //   // console.log(
+        //   //   `this.backboneModel.get('renderers')`,
+        //   //   this.backboneModel.get('renderers'),
+        //   // );
+        //   // console.log('print');
+        //   // this.backboneModel.save_changes();
+        // });
+        this.backboneModel.createWidget();
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {
