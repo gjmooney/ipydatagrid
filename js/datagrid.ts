@@ -767,13 +767,9 @@ export class DataGridView extends DOMWidgetView {
 
 export {
   BarRendererModel,
-  BarRendererView,
-  ImageRendererModel,
-  ImageRendererView,
-  HyperlinkRendererModel,
-  HyperlinkRendererView,
-  TextRendererModel,
-  TextRendererView,
+  BarRendererView, HtmlRendererModel, HtmlRendererView, HyperlinkRendererModel,
+  HyperlinkRendererView, ImageRendererModel,
+  ImageRendererView, TextRendererModel, TextRendererView
 } from './cellrenderer';
 export { VegaExprModel, VegaExprView } from './vegaexpr';
 

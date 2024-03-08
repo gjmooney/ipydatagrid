@@ -5,6 +5,7 @@ from ._version import __version__
 from .cellrenderer import (
     BarRenderer,
     CellRenderer,
+    HtmlRenderer,
     Expr,
     HyperlinkRenderer,
     ImageRenderer,
@@ -37,6 +38,7 @@ __all__ = [
     "HyperlinkRenderer",
     "ImageRenderer",
     "TextRenderer",
+    "HtmlRenderer",
     "VegaExpr",
     "DataGrid",
     "SelectionHelper",
