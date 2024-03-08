@@ -1,23 +1,22 @@
 // Copyright (c) Bloomberg
 // Distributed under the terms of the Modified BSD License.
 
-import * as _ from 'underscore';
-
 const d3Format: any = require('d3-format');
 const d3TimeFormat: any = require('d3-time-format');
 
 import {
   CellRenderer,
-  TextRenderer,
   HyperlinkRenderer,
   ImageRenderer,
+  TextRenderer,
 } from '@lumino/datagrid';
 
 import {
   Dict,
+  ISerializers,
   WidgetModel,
   WidgetView,
-  ISerializers,
+  pack_models,
   resolvePromisesDict,
   unpack_models,
 } from '@jupyter-widgets/base';
@@ -282,15 +281,39 @@ export class TextRendererModel extends CellRendererModel {
 
   static serializers: ISerializers = {
     ...CellRendererModel.serializers,
-    font: { deserialize: unpack_models as any },
-    text_color: { deserialize: unpack_models as any },
-    text_wrap: { deserialize: unpack_models as any },
-    text_elide_direction: { deserialize: unpack_models as any },
-    text_value: { deserialize: unpack_models as any },
-    background_color: { deserialize: unpack_models as any },
-    vertical_alignment: { deserialize: unpack_models as any },
-    horizontal_alignment: { deserialize: unpack_models as any },
-    format: { deserialize: unpack_models as any },
+    font: { deserialize: unpack_models as any, serialize: pack_models as any },
+    text_color: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    text_wrap: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    text_elide_direction: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    text_value: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    background_color: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    vertical_alignment: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    horizontal_alignment: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
+    format: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
   };
 
   static model_name = 'TextRendererModel';

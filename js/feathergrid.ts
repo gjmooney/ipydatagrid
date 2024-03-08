@@ -884,19 +884,20 @@ export class FeatherGrid extends Widget {
     });
   }
 
-  private blahblah(model: any) {
-    const newRend = {
-      ...this.backboneModel.get('renderers'),
-      Horsepower: model,
-    };
+  // private blahblah(model: any) {
+  //   const newRend = {
+  //     ...this.backboneModel.get('renderers'),
+  //     Horsepower: model,
+  //   };
 
-    console.log('newRend', newRend);
+  //   console.log('newRend', newRend);
 
-    this.backboneModel.set('renderers', newRend);
-    this.backboneModel.save_changes();
+  //   this.backboneModel.set('renderers', newRend);
+  //   this.backboneModel.save_changes();
 
-    console.log('this get renderers', this.backboneModel.get('renderers'));
-  }
+  //   console.log('this get renderers', this.backboneModel.get('renderers'));
+  // }
+
   private _createNewAlignmentWidget() {
     return this.backboneModel.widget_manager
       .new_widget({
@@ -1096,8 +1097,9 @@ export class FeatherGrid extends Widget {
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignLeft, {
       label: 'Align Left',
       mnemonic: -1,
-      execute: async (args) => {
+      execute: (args) => {
         this._createNewAlignmentWidget().then((model) => {
+          console.log('model', model);
           const newRend = {
             ...this.backboneModel.get('renderers'),
             Horsepower: model,
@@ -1110,6 +1112,7 @@ export class FeatherGrid extends Widget {
             `this.backboneModel.get('renderers')`,
             this.backboneModel.get('renderers'),
           );
+          console.log('print');
           this.backboneModel.save_changes();
         });
       },
