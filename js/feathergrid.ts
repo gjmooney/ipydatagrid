@@ -884,51 +884,16 @@ export class FeatherGrid extends Widget {
     });
   }
 
-  // private blahblah(model: any) {
-  //   const newRend = {
-  //     ...this.backboneModel.get('renderers'),
-  //     Horsepower: model,
-  //   };
-
-  //   console.log('newRend', newRend);
-
-  //   this.backboneModel.set('renderers', newRend);
-  //   this.backboneModel.save_changes();
-
-  //   console.log('this get renderers', this.backboneModel.get('renderers'));
-  // }
-
-  private _createNewAlignmentWidget() {
-    return this.backboneModel.widget_manager
-      .new_widget({
-        model_name: 'TextRendererModel',
-        model_module: MODULE_NAME,
-        model_module_version: MODULE_VERSION,
-        view_name: 'TextRendererView',
-        view_module: MODULE_NAME,
-        view_module_version: MODULE_VERSION,
-      })
-      .then((model) => {
-        // model.set('horizontal_alignment', 'right');
-        // model.save_changes();
-        return model;
-      });
-  }
-
-  private _updateAlignment(
-    columnName: string,
-    align: TextRenderer.HorizontalAlignment,
-  ) {
-    const updatedRenderers = {
-      ...this.renderers,
-    };
-
-    //@ts-ignore
-    updatedRenderers[columnName]['horizontalAlignment'] = align;
-
-    this.backboneModel.save_changes();
-
-    this.renderers = updatedRenderers;
+  private async _createTextRendererWidget() {
+    const model = await this.backboneModel.widget_manager.new_widget({
+      model_name: 'TextRendererModel',
+      model_module: MODULE_NAME,
+      model_module_version: MODULE_VERSION,
+      view_name: 'TextRendererView',
+      view_module: MODULE_NAME,
+      view_module_version: MODULE_VERSION,
+    });
+    return model;
   }
 
   private _createCommandRegistry(): CommandRegistry {
@@ -1098,7 +1063,7 @@ export class FeatherGrid extends Widget {
       label: 'Align Left',
       mnemonic: -1,
       execute: (args) => {
-        // this._createNewAlignmentWidget().then((model) => {
+        // this._createTextRendererWidget().then((model) => {
         //   // console.log('model', model);
         //   // const newRend = {
         //   //   ...this.backboneModel.get('renderers'),
@@ -1113,7 +1078,7 @@ export class FeatherGrid extends Widget {
         //   // console.log('print');
         //   // this.backboneModel.save_changes();
         // });
-        this.backboneModel.createWidget();
+        // this.backboneModel.createWidget();
       },
     });
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignCenter, {
@@ -1149,28 +1114,45 @@ export class FeatherGrid extends Widget {
     commands.addCommand(FeatherGridContextMenu.CommandID.AlignRight, {
       label: 'Align Right',
       mnemonic: -1,
-      execute: (args) => {
+      execute: async (args) => {
         const commandArgs = <FeatherGridContextMenu.CommandArgs>args;
-        // const align: TextRenderer.HorizontalAlignment = 'right';
         const columnName: string = this.dataModel.metadata(
           commandArgs.region,
           commandArgs.rowIndex,
           commandArgs.columnIndex,
         )['name'];
 
-        // const updatedRenderers = {
-        //   ...this._renderers,
-        // };
+        const currentRenderers = this.backboneModel.get('renderers');
+        const defaultRenderer = this.backboneModel.get('default_renderer');
+        const currentRendererForColumn = currentRenderers[columnName];
 
-        // (
-        //   updatedRenderers[columnName] as TextRenderer.IOptions
-        // ).horizontalAlignment = align;
+        // If there is a renderer for which we can set the alignement, set it
+        if (
+          currentRendererForColumn !== undefined &&
+          'horizontal_alignment' in currentRendererForColumn.attributes
+        ) {
+          currentRendererForColumn.set('horizontal_alignment', 'right');
+          currentRendererForColumn.save_changes();
+          return;
+        }
 
-        // this.backboneModel.save_changes();
+        // Assuming it's using the default renderer, we create a new renderer and copy its attributes
+        // TODO create a renderer of the same type as the default renderer
+        const model = await this._createTextRendererWidget();
+        for (const attr in model.attributes) {
+          if (attr in defaultRenderer.attributes) {
+            model.set(attr, defaultRenderer.get(attr));
+          }
+        }
+        model.set('horizontal_alignment', 'right');
+        model.save_changes();
 
-        // this.renderers = updatedRenderers;
+        const updatedRenderers = { ...currentRenderers };
+        updatedRenderers[columnName] = model;
 
-        this._updateAlignment(columnName, 'right');
+        // TODO Find why this is not propagated to Python correctly
+        this.backboneModel.set('renderers', updatedRenderers);
+        this.backboneModel.save_changes();
       },
     });
 

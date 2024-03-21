@@ -101,49 +101,6 @@ export class DataGridModel extends DOMWidgetModel {
     });
   }
 
-  createTextRenderer() {
-    return this.widget_manager.new_widget({
-      model_name: 'TextRendererModel',
-        model_module: MODULE_NAME,
-        model_module_version: MODULE_VERSION,
-        view_name: 'TextRendererView',
-        view_module: MODULE_NAME,
-        view_module_version: MODULE_VERSION,
-    }).then((model) => {
-
-      model.set('horizontal_alignment', 'right');
-      
-      model.save_changes();
-
-
-      const newRend = {
-        ...this.get('renderers'),
-        Horsepower: model,
-      };
-  
-      console.log('newRend', newRend);
-  
-      this.set('renderers', newRend);
-      this.save_changes();
-  
-
-      // const newRend = {
-      //   ...this.get('renderers'),
-      //   Horsepower: model,
-      // };
-
-      // console.log('newRend', newRend)
-
-      // this.set('renderers', newRend)
-
-      // console.log('this get renderers', this.get('renderers'))
-      return model
-
-    }).finally(() => {
-      console.log('finally')
-    })
-  }
-
   updateDataSync(sender: any, msg: any) {
     switch (msg.type) {
       case 'row-indices-updated':
@@ -318,33 +275,13 @@ export class DataGridModel extends DOMWidgetModel {
     return this.get('_data');
   }
 
-  createWidget() {
-    const nw = this.widget_manager
-      .new_widget({
-        model_name: 'TextRendererModel',
-        model_module: MODULE_NAME,
-        model_module_version: MODULE_VERSION,
-        view_name: 'TextRendererView',
-        view_module: MODULE_NAME,
-        view_module_version: MODULE_VERSION,
-        model_id: '3232323232'
-      })
-      .then((model) => {
-        // model.set('horizontal_alignment', 'right');
-        // model.save_changes();
-        console.log('model', model)
-        return model;
-      }).catch(() => {
-        console.log('error')
-      });
-
-      
-  }
-
   static serializers: ISerializers = {
     ...DOMWidgetModel.serializers,
     transforms: { deserialize: unpack_models as any },
-    renderers: { deserialize: unpack_models as any, serialize: pack_models as any },
+    renderers: {
+      deserialize: unpack_models as any,
+      serialize: pack_models as any,
+    },
     corner_renderer: { deserialize: unpack_models as any },
     default_renderer: { deserialize: unpack_models as any },
     header_renderer: { deserialize: unpack_models as any },
@@ -594,7 +531,7 @@ export class DataGridView extends DOMWidgetView {
       () => {
         this.updateRenderers()
           .then(this.updateGridStyle.bind(this))
-          .then(this.updateGridRenderers.bind(this))
+          .then(this.updateGridRenderers.bind(this));
       },
       this,
     );
@@ -718,7 +655,7 @@ export class DataGridView extends DOMWidgetView {
     _.each(
       this.model.get('renderers'),
       (model: CellRendererModel, key: string) => {
-
+        console.log('create view for renderer ', key, model);
         renderer_promises[key] = this.create_child_view(model);
       },
     );
@@ -801,7 +738,6 @@ export class DataGridView extends DOMWidgetView {
       this.grid.cornerHeaderRenderer = cornerHeaderRenderer;
     }
     this.grid.renderers = renderers;
-
   }
 
   private _initializeTheme() {
@@ -836,10 +772,13 @@ export class DataGridView extends DOMWidgetView {
 
 export {
   BarRendererModel,
-  BarRendererView, HyperlinkRendererModel,
-  HyperlinkRendererView, ImageRendererModel,
-  ImageRendererView, TextRendererModel,
-  TextRendererView
+  BarRendererView,
+  HyperlinkRendererModel,
+  HyperlinkRendererView,
+  ImageRendererModel,
+  ImageRendererView,
+  TextRendererModel,
+  TextRendererView,
 } from './cellrenderer';
 export { VegaExprModel, VegaExprView } from './vegaexpr';
 
